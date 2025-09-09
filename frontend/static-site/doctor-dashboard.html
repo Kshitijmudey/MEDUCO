@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Doctor Dashboard • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+          <a href="patients.html">Patients</a>
+          <a href="care-plans.html">Care Plans</a>
+          <a href="appointments.html">Appointments</a>
+          <a href="records.html">Records</a>
+          <a href="doctor-messages.html">Messages</a>
+          <a href="login.html">Logout</a>
+        </nav>
+        <button aria-label="Toggle theme" class="themeToggle" id="themeToggle" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button aria-label="Toggle menu" class="nav-toggle responsive-show" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <h1 class="text-responsive-3xl">Welcome, <span id="doctorName">Doctor</span></h1>
+          <p class="muted text-responsive-base">Today's schedule and patients requiring attention.</p>
+
+          <!-- Practice Overview -->
+          <div class="grid-4" style="margin-bottom: 24px;">
+            <div class="overview-card">
+              <div class="overview-icon">👥</div>
+              <div class="overview-content">
+                <div class="overview-value text-responsive-2xl">124</div>
+                <div class="overview-label text-responsive-base">Total Patients</div>
+              </div>
+            </div>
+            <div class="overview-card">
+              <div class="overview-icon">📅</div>
+              <div class="overview-content">
+                <div class="overview-value text-responsive-2xl">9</div>
+                <div class="overview-label text-responsive-base">Today's Appointments</div>
+              </div>
+            </div>
+            <div class="overview-card">
+              <div class="overview-icon">🔴</div>
+              <div class="overview-content">
+                <div class="overview-value text-responsive-2xl">3</div>
+                <div class="overview-label text-responsive-base">Urgent Alerts</div>
+              </div>
+            </div>
+            <div class="overview-card">
+              <div class="overview-icon">📊</div>
+              <div class="overview-content">
+                <div class="overview-value text-responsive-2xl">85%</div>
+                <div class="overview-label text-responsive-base">Patient Satisfaction</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="grid-2" style="margin-bottom: 24px;">
+            <div class="card">
+              <h3 style="margin-top: 0;" class="text-responsive-xl">Weekly Appointment Trends</h3>
+              <div class="chart-container">
+                <canvas id="appointmentChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0;" class="text-responsive-xl">Patient Age Distribution</h3>
+              <div class="chart-container">
+                <canvas id="ageChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient Statistics -->
+          <div class="grid-3" style="margin-bottom: 24px;">
+            <div class="card">
+              <h3 style="margin-top: 0;" class="text-responsive-xl">Top Conditions</h3>
+              <div class="stat-item">
+                <span>Diabetes</span>
+                <span class="stat-value">32%</span>
+              </div>
+              <div class="stat-item">
+                <span>Hypertension</span>
+                <span class="stat-value">28%</span>
+              </div>
+              <div class="stat-item">
+                <span>Cardiovascular</span>
+                <span class="stat-value">18%</span>
+              </div>
+              <div class="stat-item">
+                <span>Respiratory</span>
+                <span class="stat-value">12%</span>
+              </div>
+              <div class="stat-item">
+                <span>Other</span>
+                <span class="stat-value">10%</span>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0;" class="text-responsive-xl">Recent Lab Results</h3>
+              <div class="stat-item">
+                <span>Normal</span>
+                <span class="stat-value normal">67%</span>
+              </div>
+              <div class="stat-item">
+                <span>Borderline</span>
+                <span class="stat-value warning">23%</span>
+              </div>
+              <div class="stat-item">
+                <span>Abnormal</span>
+                <span class="stat-value alert">10%</span>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0;" class="text-responsive-xl">Care Plan Status</h3>
+              <div class="stat-item">
+                <span>Active</span>
+                <span class="stat-value active">45</span>
+              </div>
+              <div class="stat-item">
+                <span>Completed</span>
+                <span class="stat-value completed">28</span>
+              </div>
+              <div class="stat-item">
+                <span>Pending Review</span>
+                <span class="stat-value pending">12</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3 style="margin-top:0">Today's Appointments</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Patient</th>
+                      <th>Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>09:30</td>
+                      <td>Jane Cooper</td>
+                      <td>HbA1c follow-up</td>
+                    </tr>
+                    <tr>
+                      <td>11:00</td>
+                      <td>Wade Warren</td>
+                      <td>BP check</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top:0">AI Insights</h3>
+              <ul>
+                <li>3 patients have overdue labs</li>
+                <li>1 high-risk alert for medication adherence</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      // Simple chart rendering using Canvas
+      function drawAppointmentChart() {
+        const canvas = document.getElementById('appointmentChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Chart data
+        const data = [12, 15, 8, 20, 18, 22, 9]; // Monday to Sunday
+        const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        
+        const width = canvas.width;
+        const height = canvas.height;
+        const barWidth = (width - 40) / data.length;
+        const maxValue = Math.max(...data);
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw bars
+        data.forEach((value, index) => {
+          const barHeight = (value / maxValue) * (height - 60);
+          const x = 20 + index * barWidth;
+          const y = height - 40 - barHeight;
+          
+          // Bar
+          ctx.fillStyle = '#2563eb';
+          ctx.fillRect(x, y, barWidth - 4, barHeight);
+          
+          // Value
+          ctx.fillStyle = '#374151';
+          ctx.font = '12px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(value, x + barWidth/2, y - 5);
+          
+          // Label
+          ctx.fillText(labels[index], x + barWidth/2, height - 15);
+        });
+      }
+      
+      function drawAgeChart() {
+        const canvas = document.getElementById('ageChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Chart data
+        const data = [
+          { label: '18-30', value: 15, color: '#3b82f6' },
+          { label: '31-45', value: 28, color: '#10b981' },
+          { label: '46-60', value: 42, color: '#f59e0b' },
+          { label: '61-75', value: 32, color: '#ef4444' },
+          { label: '75+', value: 7, color: '#8b5cf6' }
+        ];
+        
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(centerX, centerY) - 30;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Calculate total
+        const total = data.reduce((sum, item) => sum + item.value, 0);
+        
+        // Draw pie chart
+        let currentAngle = -Math.PI / 2;
+        data.forEach(item => {
+          const sliceAngle = (item.value / total) * 2 * Math.PI;
+          
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+          ctx.closePath();
+          ctx.fillStyle = item.color;
+          ctx.fill();
+          
+          // Draw label
+          const labelAngle = currentAngle + sliceAngle / 2;
+          const labelX = centerX + Math.cos(labelAngle) * (radius * 0.7);
+          const labelY = centerY + Math.sin(labelAngle) * (radius * 0.7);
+          
+          ctx.fillStyle = '#374151';
+          ctx.font = '10px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(item.label, labelX, labelY);
+          
+          currentAngle += sliceAngle;
+        });
+      }
+      
+      // Initialize charts when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        drawAppointmentChart();
+        drawAgeChart();
+        
+        // Display doctor name if it exists
+        const doctorName = localStorage.getItem('doctorName');
+        if (doctorName) {
+          document.getElementById('doctorName').textContent = doctorName;
+        }
+      });
+    </script>
+  </body>
+</html> 

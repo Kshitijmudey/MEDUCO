@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Patient Dashboard • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+          <a href="login.html">Logout</a>
+        </nav>
+        <button aria-label="Toggle theme" class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button aria-label="Toggle menu" class="nav-toggle responsive-show" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <h1 class="text-responsive-3xl">Welcome, <span id="patientName">Jane Cooper</span></h1>
+          <div id="patientIDDisplay" style="display: none; margin-bottom: 16px;">
+            <p style="margin: 0; color: var(--brand); font-size: 18px; font-weight: 600;" class="text-responsive-lg">
+              Patient ID: <span id="patientID" style="font-family: monospace; color: var(--text); font-weight: 700; background: transparent; border: none; padding: 0; margin: 0;"></span>
+            </p>
+          </div>
+          <p class="muted text-responsive-base">Here's your personalized health overview and reminders.</p>
+          
+          <!-- Daily Reminders Section -->
+          <div class="card" style="margin-bottom: 24px; border-left: 4px solid #ef4444;">
+            <h3 style="margin-top:0; color: #ef4444;" class="text-responsive-xl">Today's Reminders</h3>
+            <div class="grid-2">
+              <div>
+                <h4 class="text-responsive-lg">Medication Schedule</h4>
+                <ul style="margin: 8px 0; padding-left: 20px;" class="text-responsive-base">
+                  <li><strong>8:00 AM:</strong> Metformin 500mg</li>
+                  <li><strong>8:00 PM:</strong> Metformin 500mg</li>
+                  <li><strong>9:00 PM:</strong> Blood pressure check</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="text-responsive-lg">Daily Tasks</h4>
+                <ul style="margin: 8px 0; padding-left: 20px;" class="text-responsive-base">
+                  <li>Log fasting glucose reading</li>
+                  <li>30-minute walk</li>
+                  <li>Drink 8 glasses of water</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Upcoming Appointments -->
+            <div class="card">
+              <h3 style="margin-top:0">Upcoming Appointments</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Doctor</th>
+                      <th>Department</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>2025-09-02</td>
+                      <td>10:30 AM</td>
+                      <td>Dr. Smith</td>
+                      <td>Cardiology</td>
+                    </tr>
+                    <tr>
+                      <td>2025-09-18</td>
+                      <td>2:00 PM</td>
+                      <td>Dr. Lee</td>
+                      <td>Endocrinology</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Health Metrics -->
+            <div class="card">
+              <h3 style="margin-top:0">Recent Health Metrics</h3>
+              <div style="display: grid; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                  <span style="color: var(--text);">Blood Glucose (Fasting)</span>
+                  <span style="font-weight: 600; color: #059669;">126 mg/dL</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                  <span style="color: var(--text);">Blood Pressure</span>
+                  <span style="font-weight: 600; color: #dc2626;">140/90 mmHg</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                  <span style="color: var(--text);">Weight</span>
+                  <span style="font-weight: 600; color: var(--text);">68.5 kg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Care Plan Progress -->
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top:0">Care Plan Progress</h3>
+            <div class="grid-2">
+              <div>
+                <h4>Weekly Goals</h4>
+                <ul style="margin: 8px 0; padding-left: 20px;">
+                  <li>✅ Exercise 5 times this week (3/5 completed)</li>
+                  <li>✅ Monitor blood glucose daily (5/7 completed)</li>
+                  <li>⏳ Take all medications on time (85% adherence)</li>
+                  <li>⏳ Attend support group meeting</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Next Steps</h4>
+                <ul style="margin: 8px 0; padding-left: 20px;">
+                  <li>Schedule lab work for HbA1c test</li>
+                  <li>Book nutritionist consultation</li>
+                  <li>Update emergency contact information</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top:0" class="text-responsive-xl">Quick Actions</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;" class="quick-actions">
+              <a href="log-blood-sugar.html" class="btn btn-outline text-responsive-base">Log Blood Sugar</a>
+              <a href="request-appointment.html" class="btn btn-outline text-responsive-base">Request Appointment</a>
+              <a href="message-doctor.html" class="btn btn-outline text-responsive-base">Message Doctor</a>
+              <a href="patient-care-plans.html" class="btn btn-outline text-responsive-base">View Care Plans</a>
+              <a href="download-records.html" class="btn btn-outline text-responsive-base">Download Records</a>
+            </div>
+          </div>
+
+          <!-- AI Website Assistant -->
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top: 0;" class="text-responsive-xl">🤖 AI Website Assistant</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;" class="text-responsive-base">Ask me questions about the MEDUCO platform and how to use it.</p>
+            
+            <div class="chat-container" style="background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 16px; max-height: 300px; overflow-y: auto; border: 1px solid var(--border);">
+              <div id="chatMessages">
+                <div style="background: var(--brand-light); padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid var(--brand);">
+                  <p style="margin: 0; font-size: 14px; color: var(--text);"><strong>AI Assistant:</strong> Hello! I'm your AI website assistant. I can help you navigate the MEDUCO platform, explain features, and answer questions about how to use the system. What would you like to know?</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-container">
+              <div class="row">
+                <input class="input" id="chatInput" placeholder="Type your health question here..." style="flex: 1;">
+                <button class="btn btn-primary" onclick="sendMessage()">Ask</button>
+              </div>
+            </div>
+
+            <!-- Quick Question Buttons -->
+            <div style="margin-top: 16px;">
+              <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;" class="text-responsive-sm">Quick questions:</p>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn btn-outline text-responsive-xs" style="padding: 6px 12px;" onclick="askQuickQuestion('How do I log my blood sugar?')">Log Blood Sugar</button>
+                <button class="btn btn-outline text-responsive-xs" style="padding: 6px 12px;" onclick="askQuickQuestion('How to request an appointment?')">Request Appointment</button>
+                <button class="btn btn-outline text-responsive-xs" style="padding: 6px 12px;" onclick="askQuickQuestion('How to message my doctor?')">Message Doctor</button>
+                <button class="btn btn-outline text-responsive-xs" style="padding: 6px 12px;" onclick="askQuickQuestion('How to view my care plans?')">View Care Plans</button>
+                <button class="btn btn-outline text-responsive-xs" style="padding: 6px 12px;" onclick="askQuickQuestion('How to download my records?')">Download Records</button>
+                <button class="btn btn-outline text-responsive-xs" style="padding: 6px 12px;" onclick="askQuickQuestion('What is MEDUCO?')">About MEDUCO</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      // Display patient ID if it exists
+      window.addEventListener('DOMContentLoaded', function() {
+        const patientID = localStorage.getItem('patientID')
+        const patientName = localStorage.getItem('patientName')
+        
+        if (patientID) {
+          document.getElementById('patientIDDisplay').style.display = 'block'
+          document.getElementById('patientID').textContent = patientID
+        }
+        
+        if (patientName) {
+          document.getElementById('patientName').textContent = patientName
+        }
+      })
+
+      // AI Website Assistant functionality
+      const websiteKnowledgeBase = {
+        'blood sugar': {
+          keywords: ['blood sugar', 'glucose', 'log', 'logging', 'sugar'],
+          response: 'To log your blood sugar: 1) Click on "Log Blood Sugar" in the Quick Actions section, 2) Enter your glucose reading, 3) Select the time of day (fasting, before meal, after meal), 4) Add any notes about what you ate or activities, 5) Click "Save Reading". Your readings are stored and can be shared with your doctor during appointments.'
+        },
+        'appointment': {
+          keywords: ['appointment', 'request', 'schedule', 'booking', 'book'],
+          response: 'To request an appointment: 1) Click "Request Appointment" in Quick Actions, 2) Select your preferred date and time, 3) Choose the type of appointment (check-up, follow-up, consultation), 4) Add any specific concerns or symptoms, 5) Submit your request. Your doctor will review and confirm the appointment time. You\'ll receive a confirmation once approved.'
+        },
+        'message': {
+          keywords: ['message', 'doctor', 'contact', 'communication', 'chat'],
+          response: 'To message your doctor: 1) Click "Message Doctor" in Quick Actions, 2) Select your doctor from the list, 3) Choose the topic (medical question, appointment change, prescription refill), 4) Type your message with details, 5) Click "Send Message". Your doctor typically responds within 24-48 hours. For urgent medical concerns, call your doctor\'s office directly.'
+        },
+        'care plans': {
+          keywords: ['care plan', 'care plans', 'treatment plan', 'plan'],
+          response: 'To view your care plans: 1) Click "View Care Plans" in Quick Actions, 2) See all active and completed care plans, 3) Click "View Details" on any plan to see goals, treatments, and progress, 4) Track your progress on weekly goals, 5) View next steps and upcoming reviews. Care plans are created by your doctor and updated based on your progress.'
+        },
+        'records': {
+          keywords: ['records', 'download', 'medical records', 'documents', 'files'],
+          response: 'To download your records: 1) Click "Download Records" in Quick Actions, 2) Choose the type of records (lab results, medications, appointments, full history), 3) Select the date range, 4) Choose format (PDF, CSV), 5) Click "Download". Your records are securely stored and can be shared with other healthcare providers or for personal reference.'
+        },
+        'meduco': {
+          keywords: ['meduco', 'what is', 'platform', 'system', 'about'],
+          response: 'MEDUCO is an AI-powered patient care management platform that connects patients with their healthcare providers. Key features include: patient dashboards, appointment scheduling, secure messaging, care plan tracking, health record management, and AI-powered insights. The platform helps streamline healthcare delivery, improve patient engagement, and provide better health outcomes through technology and artificial intelligence.'
+        },
+        'dashboard': {
+          keywords: ['dashboard', 'home', 'main page', 'overview', 'summary'],
+          response: 'Your patient dashboard provides: 1) Daily reminders and medication schedule, 2) Upcoming appointments, 3) Recent health metrics (blood glucose, blood pressure, weight), 4) Care plan progress and weekly goals, 5) Quick actions for common tasks, 6) AI assistant for platform help. Use the dashboard to stay on top of your health management and access all platform features.'
+        },
+        'login': {
+          keywords: ['login', 'sign in', 'password', 'account', 'access'],
+          response: 'To access your account: 1) Go to the login page, 2) Enter your email and password, 3) Select your role (Patient/Doctor), 4) Click "Sign In". If you forgot your password, use the "Forgot Password" link. For new users, click "Sign Up" to create an account. Your patient ID is assigned during signup and displayed on your dashboard.'
+        }
+      };
+
+      function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const question = input.value.trim();
+        
+        if (!question) {
+          alert('Please enter a question');
+          return;
+        }
+
+        addMessage('user', question);
+        const response = getAIResponse(question);
+        addMessage('ai', response);
+        
+        input.value = '';
+        scrollToBottom();
+      }
+
+      function askQuickQuestion(question) {
+        document.getElementById('chatInput').value = question;
+        sendMessage();
+      }
+
+      function getAIResponse(question) {
+        const lowerQuestion = question.toLowerCase();
+        
+        // Check for specific website topics
+        for (const [topic, data] of Object.entries(websiteKnowledgeBase)) {
+          if (data.keywords.some(keyword => lowerQuestion.includes(keyword))) {
+            return data.response;
+          }
+        }
+
+        // General website response for unrecognized questions
+        return 'I\'m here to help you navigate the MEDUCO platform! I can explain how to use features like logging blood sugar, requesting appointments, messaging doctors, viewing care plans, downloading records, and more. For specific questions about the platform, try asking about any of the features shown in the Quick Actions section. What would you like to know about?';
+      }
+
+      function addMessage(sender, message) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        
+        if (sender === 'user') {
+          messageDiv.style.cssText = 'background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #9333ea; text-align: right;';
+          messageDiv.innerHTML = `<p style="margin: 0; font-size: 14px;"><strong>You:</strong> ${message}</p>`;
+        } else {
+          messageDiv.style.cssText = 'background: #e0f2fe; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #0288d1;';
+          messageDiv.innerHTML = `<p style="margin: 0; font-size: 14px;"><strong>AI Assistant:</strong> ${message}</p>`;
+        }
+        
+        chatMessages.appendChild(messageDiv);
+      }
+
+      function scrollToBottom() {
+        const chatContainer = document.querySelector('.chat-container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      // Allow Enter key to send message
+      document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    </script>
+  </body>
+</html> 

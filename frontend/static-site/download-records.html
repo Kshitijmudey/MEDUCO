@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Download Records • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="patient-dashboard.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+          <a href="patient-dashboard.html">← Back to Dashboard</a>
+          <a href="login.html">Logout</a>
+        </nav>
+        <button aria-label="Toggle theme" class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button aria-label="Toggle menu" class="nav-toggle" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container" style="max-width: 800px">
+          <h1>Download Medical Records</h1>
+          <p class="muted">Access and download your complete medical history.</p>
+          
+          <div class="grid-2">
+            <!-- Download Options -->
+            <div class="card">
+              <h3 style="margin-top:0">Download Records</h3>
+              <form class="form" id="downloadForm">
+                <select class="input" name="record-type" required>
+                  <option value="">Select Record Type</option>
+                  <option value="all">Complete Medical Record</option>
+                  <option value="lab-results">Lab Results Only</option>
+                  <option value="medications">Medication History</option>
+                  <option value="appointments">Appointment History</option>
+                  <option value="vitals">Vital Signs</option>
+                </select>
+                <select class="input" name="date-range" required>
+                  <option value="">Select Date Range</option>
+                  <option value="last-30">Last 30 Days</option>
+                  <option value="last-90">Last 90 Days</option>
+                  <option value="last-year">Last Year</option>
+                  <option value="all-time">All Time</option>
+                </select>
+                <select class="input" name="format" required>
+                  <option value="">Select Format</option>
+                  <option value="pdf">PDF</option>
+                  <option value="csv">CSV</option>
+                  <option value="json">JSON</option>
+                  <option value="xml">XML (FHIR)</option>
+                </select>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="checkbox" name="include-notes" id="include-notes">
+                  <label for="include-notes">Include doctor's notes</label>
+                </div>
+                <button class="btn btn-primary" type="submit">Generate Download</button>
+                <div class="form-note" id="formNote" role="status" aria-live="polite"></div>
+              </form>
+            </div>
+
+            <!-- Recent Downloads -->
+            <div class="card">
+              <h3 style="margin-top:0">Recent Downloads</h3>
+              <div style="display: grid; gap: 12px;">
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #10b981;">
+                  <div style="font-weight: 600;">Lab Results - Last 30 Days</div>
+                                  <div style="color: var(--text-secondary); font-size: 14px;">PDF • 2.3 MB</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">Downloaded 2 hours ago</div>
+                </div>
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                  <div style="font-weight: 600;">Complete Record - All Time</div>
+                                  <div style="color: var(--text-secondary); font-size: 14px;">PDF • 15.7 MB</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">Downloaded 1 day ago</div>
+                </div>
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                  <div style="font-weight: 600;">Medication History</div>
+                                  <div style="color: var(--text-secondary); font-size: 14px;">CSV • 0.8 MB</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">Downloaded 3 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Record Summary -->
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top:0">Your Records Summary</h3>
+            <div class="grid-2">
+              <div>
+                <h4>Available Records</h4>
+                <ul style="margin: 8px 0; padding-left: 20px;">
+                  <li>Lab Results: 45 reports</li>
+                  <li>Medications: 12 prescriptions</li>
+                  <li>Appointments: 28 visits</li>
+                  <li>Vital Signs: 156 readings</li>
+                  <li>Imaging: 8 scans</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Data Coverage</h4>
+                <ul style="margin: 8px 0; padding-left: 20px;">
+                  <li>Earliest Record: Jan 2020</li>
+                  <li>Last Updated: Today</li>
+                  <li>Total Size: ~45 MB</li>
+                  <li>Format: FHIR-compliant</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Notice -->
+          <div class="card" style="margin-top: 24px; background: #fef3c7; border-color: #f59e0b;">
+            <h3 style="margin-top:0; color: #92400e;">Security & Privacy</h3>
+            <p style="color: #92400e; margin: 0;">
+              Your medical records are protected by HIPAA regulations. Downloads are encrypted and 
+              should be stored securely. Never share your medical records with unauthorized parties.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html> 
