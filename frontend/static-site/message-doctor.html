@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Message Doctor • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="patient-dashboard.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+          <a href="patient-dashboard.html">← Back to Dashboard</a>
+          <a href="login.html">Logout</a>
+        </nav>
+        <button aria-label="Toggle theme" class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button aria-label="Toggle menu" class="nav-toggle" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container" style="max-width: 800px">
+          <h1>Message Your Doctor</h1>
+          <p class="muted">Send secure messages to your healthcare providers.</p>
+          
+          <div class="grid-2">
+            <!-- New Message -->
+            <div class="card">
+              <h3 style="margin-top:0">Send New Message</h3>
+              <form class="form" id="messageForm">
+                <select class="input" name="recipient" required>
+                  <option value="">Select Doctor</option>
+                  <option value="dr-smith">Dr. Smith - Cardiology</option>
+                  <option value="dr-lee">Dr. Lee - Endocrinology</option>
+                  <option value="dr-johnson">Dr. Johnson - Primary Care</option>
+                </select>
+                <input class="input" name="subject" placeholder="Subject" required>
+                <textarea class="input" name="message" rows="6" placeholder="Type your message here..." required></textarea>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="checkbox" name="urgent" id="urgent">
+                  <label for="urgent">Mark as urgent</label>
+                </div>
+                <button class="btn btn-primary" type="submit">Send Message</button>
+                <div class="form-note" id="formNote" role="status" aria-live="polite"></div>
+              </form>
+            </div>
+
+            <!-- Recent Messages -->
+            <div class="card">
+              <h3 style="margin-top:0">Recent Conversations</h3>
+              <div style="display: grid; gap: 12px;">
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                  <div style="font-weight: 600;">Dr. Smith</div>
+                                  <div style="color: var(--text-secondary); font-size: 14px;">Blood pressure concerns</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">2 hours ago</div>
+                </div>
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #10b981;">
+                  <div style="font-weight: 600;">Dr. Lee</div>
+                                  <div style="color: var(--text-secondary); font-size: 14px;">Medication adjustment needed</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">1 day ago</div>
+                </div>
+                <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                  <div style="font-weight: 600;">Dr. Johnson</div>
+                                  <div style="color: var(--text-secondary); font-size: 14px;">Lab results discussion</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">3 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message History -->
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top:0">Message History</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Doctor</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Today, 2:30 PM</td>
+                    <td>Dr. Smith</td>
+                    <td>Blood pressure concerns</td>
+                    <td><span class="badge" style="background: #fef3c7; color: #92400e;">Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td>Yesterday, 10:15 AM</td>
+                    <td>Dr. Lee</td>
+                    <td>Medication adjustment needed</td>
+                    <td><span class="badge" style="background: #dcfce7; color: #166534;">Replied</span></td>
+                  </tr>
+                  <tr>
+                    <td>Aug 25, 2025</td>
+                    <td>Dr. Johnson</td>
+                    <td>Lab results discussion</td>
+                    <td><span class="badge" style="background: #dcfce7; color: #166534;">Replied</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html> 

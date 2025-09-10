@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Medical Records • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+
+          <a href="patients.html">Patients</a>
+          <a href="care-plans.html">Care Plans</a>
+          <a href="appointments.html">Appointments</a>
+          <a href="records.html" aria-current="page">Records</a>
+
+        </nav>
+        <button aria-label="Toggle theme" class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button aria-label="Toggle menu" class="nav-toggle" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <div style="margin-bottom: 16px;">
+            <a href="doctor-dashboard.html" style="color: var(--brand); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+              ← Back to Dashboard
+            </a>
+          </div>
+          <h1>Medical Records</h1>
+          <p class="muted">Securely view lab results, medications, and notes. <span class="badge">FHIR-ready</span></p>
+          <div class="card">
+            <h3 style="margin-top: 0;">Search Patient Records</h3>
+            <div class="row">
+              <input class="input" id="patientIDInput" placeholder="Enter Patient ID (e.g., PAT123456)" />
+              <button class="btn btn-primary" onclick="searchPatientRecords()">Search Records</button>
+            </div>
+          </div>
+
+          <div class="card" id="patientRecords" style="margin-top: 24px; display: none;">
+            <h3 style="margin-top: 0;">Patient Records - <span id="patientName"></span></h3>
+            <p class="muted">Patient ID: <strong id="displayPatientID"></strong></p>
+            
+            <div class="grid-2" style="margin-top: 16px;">
+              <div class="mini-card">
+                <div class="mini-label">Age</div>
+                <div class="mini-value" id="patientAge">-</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">Blood Type</div>
+                <div class="mini-value" id="patientBloodType">-</div>
+              </div>
+            </div>
+
+            <h4 style="margin: 24px 0 16px;">Recent Lab Results</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Test</th>
+                    <th>Result</th>
+                    <th>Reference Range</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="labResultsTable">
+                  <!-- Lab results will be populated here -->
+                </tbody>
+              </table>
+            </div>
+
+            <h4 style="margin: 24px 0 16px;">Current Medications</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Medication</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Start Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="medicationsTable">
+                  <!-- Medications will be populated here -->
+                </tbody>
+              </table>
+            </div>
+
+            <h4 style="margin: 24px 0 16px;">Medical History</h4>
+            <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+              <div id="medicalHistory">
+                <!-- Medical history will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="noRecordsFound" style="margin-top: 24px; display: none; text-align: center; padding: 32px;">
+            <h3 style="margin: 0 0 16px; color: var(--text-secondary);">No Records Found</h3>
+            <p class="muted">No medical records found for the provided Patient ID. Please verify the ID and try again.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      // Sample patient records data
+      const patientRecords = {
+        'PAT123456': {
+          name: 'Jane Cooper',
+          age: '54',
+          bloodType: 'O+',
+          labResults: [
+            { date: '2024-08-25', test: 'HbA1c', result: '6.9%', reference: '4.0-5.6%', status: 'High' },
+            { date: '2024-08-20', test: 'Fasting Glucose', result: '128 mg/dL', reference: '70-100 mg/dL', status: 'High' },
+            { date: '2024-08-15', test: 'Cholesterol', result: '185 mg/dL', reference: '<200 mg/dL', status: 'Normal' },
+            { date: '2024-08-10', test: 'Blood Pressure', result: '135/85 mmHg', reference: '<120/80 mmHg', status: 'High' }
+          ],
+          medications: [
+            { name: 'Metformin', dosage: '500mg', frequency: 'Twice daily', startDate: '2024-01-15', status: 'Active' },
+            { name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily', startDate: '2024-03-20', status: 'Active' },
+            { name: 'Atorvastatin', dosage: '20mg', frequency: 'Once daily', startDate: '2024-02-10', status: 'Active' }
+          ],
+          medicalHistory: [
+            'Type 2 Diabetes diagnosed in 2020',
+            'Hypertension diagnosed in 2021',
+            'Hyperlipidemia diagnosed in 2022',
+            'Previous appendectomy (2018)',
+            'Family history of diabetes and heart disease'
+          ]
+        },
+        'PAT789012': {
+          name: 'Wade Warren',
+          age: '62',
+          bloodType: 'A+',
+          labResults: [
+            { date: '2024-08-22', test: 'Blood Pressure', result: '142/88 mmHg', reference: '<120/80 mmHg', status: 'High' },
+            { date: '2024-08-18', test: 'Creatinine', result: '1.2 mg/dL', reference: '0.7-1.3 mg/dL', status: 'Normal' },
+            { date: '2024-08-15', test: 'eGFR', result: '65 mL/min', reference: '>90 mL/min', status: 'Low' }
+          ],
+          medications: [
+            { name: 'Amlodipine', dosage: '5mg', frequency: 'Once daily', startDate: '2023-11-05', status: 'Active' },
+            { name: 'Losartan', dosage: '50mg', frequency: 'Once daily', startDate: '2023-12-15', status: 'Active' }
+          ],
+          medicalHistory: [
+            'Essential Hypertension diagnosed in 2019',
+            'Chronic Kidney Disease Stage 2',
+            'Previous myocardial infarction (2017)',
+            'Family history of hypertension and kidney disease'
+          ]
+        },
+        'PAT345678': {
+          name: 'Esther Howard',
+          age: '43',
+          bloodType: 'B+',
+          labResults: [
+            { date: '2024-08-24', test: 'Spirometry', result: 'FEV1: 75%', reference: '>80%', status: 'Low' },
+            { date: '2024-08-20', test: 'Peak Flow', result: '320 L/min', reference: '380-450 L/min', status: 'Low' },
+            { date: '2024-08-15', test: 'Allergy Panel', result: 'Positive for dust mites', reference: 'Negative', status: 'Positive' }
+          ],
+          medications: [
+            { name: 'Albuterol', dosage: '90mcg', frequency: 'As needed', startDate: '2022-06-10', status: 'Active' },
+            { name: 'Fluticasone', dosage: '250mcg', frequency: 'Twice daily', startDate: '2022-06-10', status: 'Active' }
+          ],
+          medicalHistory: [
+            'Asthma diagnosed in 2015',
+            'Allergic rhinitis',
+            'Previous pneumonia (2020)',
+            'Family history of asthma and allergies'
+          ]
+        }
+      };
+
+      function searchPatientRecords() {
+        const patientID = document.getElementById('patientIDInput').value.trim().toUpperCase();
+        const patientRecordsDiv = document.getElementById('patientRecords');
+        const noRecordsFoundDiv = document.getElementById('noRecordsFound');
+
+        if (!patientID) {
+          alert('Please enter a Patient ID');
+          return;
+        }
+
+        if (patientRecords[patientID]) {
+          // Hide no records message
+          noRecordsFoundDiv.style.display = 'none';
+          
+          // Show patient records
+          patientRecordsDiv.style.display = 'block';
+          
+          // Populate patient information
+          const patient = patientRecords[patientID];
+          document.getElementById('patientName').textContent = patient.name;
+          document.getElementById('displayPatientID').textContent = patientID;
+          document.getElementById('patientAge').textContent = patient.age;
+          document.getElementById('patientBloodType').textContent = patient.bloodType;
+
+          // Populate lab results
+          const labResultsTable = document.getElementById('labResultsTable');
+          labResultsTable.innerHTML = patient.labResults.map(result => `
+            <tr>
+              <td>${result.date}</td>
+              <td>${result.test}</td>
+              <td>${result.result}</td>
+              <td>${result.reference}</td>
+              <td><span class="badge" style="background: ${result.status === 'Normal' ? '#dcfce7' : '#fef3c7'}; color: ${result.status === 'Normal' ? '#166534' : '#92400e'};">
+                ${result.status}
+              </span></td>
+            </tr>
+          `).join('');
+
+          // Populate medications
+          const medicationsTable = document.getElementById('medicationsTable');
+          medicationsTable.innerHTML = patient.medications.map(med => `
+            <tr>
+              <td>${med.name}</td>
+              <td>${med.dosage}</td>
+              <td>${med.frequency}</td>
+              <td>${med.startDate}</td>
+              <td><span class="badge" style="background: #dcfce7; color: #166534;">${med.status}</span></td>
+            </tr>
+          `).join('');
+
+          // Populate medical history
+          const medicalHistoryDiv = document.getElementById('medicalHistory');
+          medicalHistoryDiv.innerHTML = patient.medicalHistory.map(history => `
+            <div style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                              <span style="color: var(--text-secondary);">•</span> ${history}
+            </div>
+          `).join('');
+
+        } else {
+          // Show no records message
+          patientRecordsDiv.style.display = 'none';
+          noRecordsFoundDiv.style.display = 'block';
+        }
+      }
+
+      // Allow Enter key to trigger search
+      document.getElementById('patientIDInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchPatientRecords();
+        }
+      });
+    </script>
+  </body>
+</html> 

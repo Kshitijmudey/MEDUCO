@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patient Messages • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+          <a href="patients.html">Patients</a>
+          <a href="care-plans.html">Care Plans</a>
+          <a href="appointments.html">Appointments</a>
+          <a href="records.html">Records</a>
+          <a href="doctor-messages.html" aria-current="page">Messages</a>
+          <a href="login.html">Logout</a>
+        </nav>
+        <button aria-label="Toggle theme" class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button aria-label="Toggle menu" class="nav-toggle" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <div style="margin-bottom: 16px;">
+            <a href="doctor-dashboard.html" style="color: var(--brand); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+              ← Back to Dashboard
+            </a>
+          </div>
+          <h1>Patient Messages</h1>
+          <p class="muted">View and respond to messages from your patients.</p>
+
+          <!-- Message Statistics -->
+          <div class="grid-3" style="margin-top: 24px;">
+            <div class="card">
+              <h3 style="margin-top: 0; font-size: 16px;">Unread Messages</h3>
+              <div style="font-size: 24px; font-weight: 700; color: #dc2626;">3</div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0; font-size: 16px;">Today's Messages</h3>
+              <div style="font-size: 24px; font-weight: 700; color: #059669;">7</div>
+            </div>
+            <div class="card">
+              <h3 style="margin-top: 0; font-size: 16px;">This Week</h3>
+              <div style="font-size: 24px; font-weight: 700; color: #2563eb;">24</div>
+            </div>
+          </div>
+
+          <!-- Message Filters -->
+          <div class="card" style="margin-top: 24px;">
+            <div class="row">
+              <button class="btn btn-primary" onclick="filterMessages('all')">All Messages</button>
+              <button class="btn btn-outline" onclick="filterMessages('unread')">Unread</button>
+              <button class="btn btn-outline" onclick="filterMessages('urgent')">Urgent</button>
+              <button class="btn btn-outline" onclick="filterMessages('today')">Today</button>
+            </div>
+          </div>
+
+          <!-- Messages List -->
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top: 0;">Recent Messages</h3>
+            <div id="messagesList">
+              <!-- Messages will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Message Details Modal -->
+          <div id="messageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 32px; border-radius: 16px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 id="modalPatientName" style="margin: 0;"></h2>
+                <button onclick="closeMessageModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary);">×</button>
+              </div>
+              
+              <div id="modalMessageContent">
+                <!-- Message content will be populated by JavaScript -->
+              </div>
+              
+              <div style="margin-top: 24px;">
+                <h4>Reply to Patient</h4>
+                <textarea class="input" id="replyMessage" placeholder="Type your reply here..." rows="4"></textarea>
+                <div class="row" style="margin-top: 16px;">
+                  <button class="btn btn-primary" onclick="sendReply()">Send Reply</button>
+                  <button class="btn btn-outline" onclick="closeMessageModal()">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      // Sample messages data
+      const patientMessages = [
+        {
+          id: 1,
+          patientName: 'Jane Cooper',
+          patientID: 'PAT123456',
+          subject: 'Blood sugar concerns',
+          message: 'Dr. Johnson, my blood sugar readings have been higher than usual this week. I\'ve been following my diet and taking medications as prescribed, but my morning readings are around 140-150 mg/dL instead of the usual 120-130 mg/dL. Should I be concerned?',
+          timestamp: '2024-08-30 09:15 AM',
+          status: 'unread',
+          priority: 'normal',
+          category: 'medical_question'
+        },
+        {
+          id: 2,
+          patientName: 'Wade Warren',
+          patientID: 'PAT789012',
+          subject: 'Medication side effects',
+          message: 'Hello Dr. Chen, I\'ve been experiencing some dizziness and fatigue since starting the new blood pressure medication. It seems to be worse in the mornings. Is this normal, or should I stop taking it?',
+          timestamp: '2024-08-30 08:30 AM',
+          status: 'unread',
+          priority: 'urgent',
+          category: 'side_effects'
+        },
+        {
+          id: 3,
+          patientName: 'Esther Howard',
+          patientID: 'PAT345678',
+          subject: 'Appointment reschedule request',
+          message: 'Dr. Howard, I need to reschedule my appointment next week. I have a work conflict on Tuesday. Would Thursday afternoon work instead? I\'m flexible with the time.',
+          timestamp: '2024-08-29 04:45 PM',
+          status: 'unread',
+          priority: 'normal',
+          category: 'appointment'
+        },
+        {
+          id: 4,
+          patientName: 'Robert Johnson',
+          patientID: 'PAT901234',
+          subject: 'Exercise program question',
+          message: 'Dr. Smith, I\'ve been following the cardiac rehab exercise program you recommended. I\'m now able to walk 30 minutes without chest pain. Can I increase the intensity or duration?',
+          timestamp: '2024-08-29 02:20 PM',
+          status: 'read',
+          priority: 'normal',
+          category: 'exercise'
+        },
+        {
+          id: 5,
+          patientName: 'Sarah Wilson',
+          patientID: 'PAT567890',
+          subject: 'Migraine frequency increased',
+          message: 'Dr. Lee, my migraines have increased from 2-3 per month to almost weekly. I\'m taking the prescribed medication, but it doesn\'t seem as effective. Should we adjust the treatment plan?',
+          timestamp: '2024-08-29 11:00 AM',
+          status: 'read',
+          priority: 'high',
+          category: 'symptoms'
+        },
+        {
+          id: 6,
+          patientName: 'Jane Cooper',
+          patientID: 'PAT123456',
+          subject: 'Lab results question',
+          message: 'I received my latest lab results in the patient portal. My HbA1c is 6.8%, which is better than last time. Does this mean my diabetes is well-controlled now?',
+          timestamp: '2024-08-28 03:15 PM',
+          status: 'read',
+          priority: 'normal',
+          category: 'lab_results'
+        },
+        {
+          id: 7,
+          patientName: 'Wade Warren',
+          patientID: 'PAT789012',
+          subject: 'Blood pressure improvement',
+          message: 'Dr. Chen, I\'ve been monitoring my blood pressure daily as recommended. It\'s been consistently around 125/80 mmHg, which is much better than before. The lifestyle changes are working!',
+          timestamp: '2024-08-28 10:30 AM',
+          status: 'read',
+          priority: 'normal',
+          category: 'progress_update'
+        }
+      ];
+
+      let currentFilter = 'all';
+
+      function displayMessages(filter = 'all') {
+        const messagesList = document.getElementById('messagesList');
+        let filteredMessages = patientMessages;
+
+        // Apply filter
+        switch(filter) {
+          case 'unread':
+            filteredMessages = patientMessages.filter(msg => msg.status === 'unread');
+            break;
+          case 'urgent':
+            filteredMessages = patientMessages.filter(msg => msg.priority === 'urgent');
+            break;
+          case 'today':
+            const today = new Date().toISOString().split('T')[0];
+            filteredMessages = patientMessages.filter(msg => msg.timestamp.includes(today));
+            break;
+        }
+
+        // Sort by timestamp (newest first)
+        filteredMessages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        messagesList.innerHTML = filteredMessages.map(msg => `
+          <div class="message-item" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: ${msg.status === 'unread' ? '#f0f9ff' : '#ffffff'};">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <div>
+                <h4 style="margin: 0 0 4px; font-size: 16px;">${msg.subject}</h4>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+                  From: <strong>${msg.patientName}</strong> (${msg.patientID}) • ${msg.timestamp}
+                </p>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                ${msg.priority === 'urgent' ? '<span class="badge" style="background: #fef2f2; color: #dc2626;">Urgent</span>' : ''}
+                ${msg.status === 'unread' ? '<span class="badge" style="background: #dcfce7; color: #166534;">New</span>' : ''}
+                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="viewMessage(${msg.id})">View & Reply</button>
+              </div>
+            </div>
+            <p style="margin: 0; color: #374151; line-height: 1.5;">
+              ${msg.message.length > 150 ? msg.message.substring(0, 150) + '...' : msg.message}
+            </p>
+          </div>
+        `).join('');
+
+        // Update filter buttons
+        updateFilterButtons(filter);
+      }
+
+      function updateFilterButtons(activeFilter) {
+        const buttons = document.querySelectorAll('.card .row .btn');
+        buttons.forEach(btn => {
+          btn.classList.remove('btn-primary');
+          btn.classList.add('btn-outline');
+        });
+        
+        const activeButton = document.querySelector(`[onclick="filterMessages('${activeFilter}')"]`);
+        if (activeButton) {
+          activeButton.classList.remove('btn-outline');
+          activeButton.classList.add('btn-primary');
+        }
+      }
+
+      function filterMessages(filter) {
+        currentFilter = filter;
+        displayMessages(filter);
+      }
+
+      function viewMessage(messageId) {
+        const message = patientMessages.find(msg => msg.id === messageId);
+        if (!message) return;
+
+        // Mark as read
+        message.status = 'read';
+        
+        document.getElementById('modalPatientName').textContent = message.patientName;
+        
+        const modalContent = document.getElementById('modalMessageContent');
+        modalContent.innerHTML = `
+          <div style="margin-bottom: 24px;">
+            <div class="grid-2" style="margin-bottom: 16px;">
+              <div class="mini-card">
+                <div class="mini-label">Patient ID</div>
+                <div class="mini-value">${message.patientID}</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">Sent</div>
+                <div class="mini-value">${message.timestamp}</div>
+              </div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-label">Subject</div>
+              <div class="mini-value">${message.subject}</div>
+            </div>
+          </div>
+
+          <h4>Message</h4>
+          <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+            <p style="margin: 0; line-height: 1.6; color: #374151;">${message.message}</p>
+          </div>
+        `;
+
+        document.getElementById('messageModal').style.display = 'block';
+        document.getElementById('replyMessage').value = '';
+      }
+
+      function closeMessageModal() {
+        document.getElementById('messageModal').style.display = 'none';
+      }
+
+      function sendReply() {
+        const replyText = document.getElementById('replyMessage').value.trim();
+        if (!replyText) {
+          alert('Please enter a reply message');
+          return;
+        }
+
+        // In a real application, this would send the reply to the patient
+        alert('Reply sent successfully to the patient!');
+        closeMessageModal();
+        
+        // Refresh messages to show updated status
+        displayMessages(currentFilter);
+      }
+
+      // Close modal when clicking outside
+      document.getElementById('messageModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeMessageModal();
+        }
+      });
+
+      // Initialize messages display
+      document.addEventListener('DOMContentLoaded', function() {
+        displayMessages('all');
+      });
+    </script>
+  </body>
+</html> 

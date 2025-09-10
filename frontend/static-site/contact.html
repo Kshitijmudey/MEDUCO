@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contact • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav">
+
+          <a href="patients.html">Patients</a>
+          <a href="care-plans.html">Care Plans</a>
+          <a href="appointments.html">Appointments</a>
+          <a href="records.html">Records</a>
+          <a href="contact.html" aria-current="page">Contact</a>
+        </nav>
+        <button aria-label="Toggle menu" class="nav-toggle" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <h1>Contact</h1>
+          <p class="muted">Have questions? Send us a message.</p>
+          <form class="card form" id="contactForm">
+            <div class="grid-2">
+              <input class="input" name="name" placeholder="Your name" required>
+              <input class="input" name="email" type="email" placeholder="Email" required>
+            </div>
+            <textarea class="input" name="message" rows="5" placeholder="How can we help?" required></textarea>
+            <button class="btn btn-primary" type="submit">Send</button>
+            <div class="form-note" id="formNote" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html> 
