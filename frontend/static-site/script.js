@@ -93,9 +93,11 @@
 
 	// Enhanced login form submission (sign-in only)
 	if (loginForm) {
-		loginForm.addEventListener('submit', (e) => {
+		loginForm.addEventListener('submit', async (e) => {
 			e.preventDefault()
 			const data = new FormData(loginForm)
+			const email = String(data.get('email') || '')
+			const password = String(data.get('password') || '')
 			const role = String(data.get('role') || 'patient')
 			const submitBtn = loginForm.querySelector('#submitBtn')
 			
@@ -106,11 +108,10 @@
 				submitBtn.style.opacity = '0.7'
 			}
 			
-			if (role === 'doctor') {
-				// For existing doctor sign-ins, we'll use a demo name
-				// In a real app, this would come from the database
-				const demoDoctorName = 'Sarah Johnson'
-				localStorage.setItem('doctorName', demoDoctorName)
+			try {
+				// Use real API for login
+				const response = await window.meducoAPI.login(email, password, role)
+				
 				if (loginNote) {
 					loginNote.innerHTML = `
 						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
@@ -119,38 +120,42 @@
 					`
 					loginNote.style.animation = 'fadeInUp 0.6s ease'
 				}
-			} else if (role === 'patient') {
-				// For existing patient sign-ins, we'll use a demo name
-				// In a real app, this would come from the database
-				const demoPatientName = 'Jane Cooper'
-				localStorage.setItem('patientName', demoPatientName)
+				
+				// Store additional data for compatibility
+				if (role === 'patient' && response.user.profile) {
+					localStorage.setItem('patientName', `${response.user.profile.first_name} ${response.user.profile.last_name}`)
+					localStorage.setItem('patientID', response.user.profile.patient_id)
+				} else if (role === 'doctor' && response.user.profile) {
+					localStorage.setItem('doctorName', `${response.user.profile.first_name} ${response.user.profile.last_name}`)
+				}
+				
+				const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
+				setTimeout(() => { window.location.href = dest }, 1500)
+				
+			} catch (error) {
+				console.error('Login failed:', error)
 				if (loginNote) {
 					loginNote.innerHTML = `
-						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
-							<p style="margin: 0; color: #059669; font-weight: 600;">✅ Signed in successfully. Redirecting...</p>
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ ${error.message || 'Login failed. Please try again.'}</p>
 						</div>
 					`
 					loginNote.style.animation = 'fadeInUp 0.6s ease'
 				}
-			}
-			
-			const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
-			setTimeout(() => { window.location.href = dest }, 1500)
-			
-			// Reset button state
-			setTimeout(() => {
+			} finally {
+				// Reset button state
 				if (submitBtn) {
 					submitBtn.textContent = 'Sign In'
 					submitBtn.disabled = false
 					submitBtn.style.opacity = '1'
 				}
-			}, 1000)
+			}
 		})
 	}
 
 	// Enhanced signup form submission
 	if (signupForm) {
-		signupForm.addEventListener('submit', (e) => {
+		signupForm.addEventListener('submit', async (e) => {
 			e.preventDefault()
 			const data = new FormData(signupForm)
 			const role = String(data.get('role') || 'patient')
@@ -195,15 +200,31 @@
 				submitBtn.style.opacity = '0.7'
 			}
 			
-			if (role === 'patient') {
-				const patientID = generatePatientID()
+			try {
+				// Parse full name
+				const nameParts = fullName.trim().split(' ')
+				const firstName = nameParts[0] || ''
+				const lastName = nameParts.slice(1).join(' ') || ''
+				
+				// Use real API for registration
+				const response = await window.meducoAPI.register({
+					email,
+					password,
+					role,
+					firstName,
+					lastName,
+					phone
+				})
+				
+				const userIdField = role === 'patient' ? response.user.patientId : response.user.doctorId
+				const displayName = role === 'doctor' ? `Dr. ${fullName}` : fullName
 				
 				if (signupNote) {
 					signupNote.innerHTML = `
 						<div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9; margin-top: 20px; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);">
-							<h4 style="margin: 0 0 12px; color: #0ea5e9; font-size: 20px;">🎉 Welcome, ${fullName}!</h4>
-							<p style="margin: 0 0 16px; color: #0ea5e9; font-size: 16px;">Your Patient ID: <strong style="font-size: 22px; background: linear-gradient(135deg, #0ea5e9, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${patientID}</strong></p>
-							<p style="margin: 0; font-size: 14px; color: #64748b;">Please save this ID. Redirecting to dashboard...</p>
+							<h4 style="margin: 0 0 12px; color: #0ea5e9; font-size: 20px;">${role === 'doctor' ? '👨‍⚕️' : '🎉'} Welcome, ${displayName}!</h4>
+							${role === 'patient' ? `<p style="margin: 0 0 16px; color: #0ea5e9; font-size: 16px;">Your Patient ID: <strong style="font-size: 22px; background: linear-gradient(135deg, #0ea5e9, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${userIdField}</strong></p>` : ''}
+							<p style="margin: 0; font-size: 14px; color: #64748b;">${role === 'patient' ? 'Please save this ID. ' : ''}Redirecting to dashboard...</p>
 							<div style="margin-top: 16px;">
 								<div style="width: 100%; height: 4px; background: #e0f2fe; border-radius: 2px; overflow: hidden;">
 									<div style="width: 0%; height: 100%; background: linear-gradient(90deg, #0ea5e9, #0284c7); border-radius: 2px; animation: progressBar 3s linear forwards;"></div>
@@ -214,49 +235,37 @@
 					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
 				
-				// Store patient ID and details in localStorage for demo purposes
-				localStorage.setItem('patientID', patientID)
-				localStorage.setItem('patientName', fullName)
-				localStorage.setItem('patientEmail', email)
-				localStorage.setItem('patientPhone', phone)
+				// Store additional data for compatibility
+				if (role === 'patient') {
+					localStorage.setItem('patientID', userIdField)
+					localStorage.setItem('patientName', fullName)
+				} else if (role === 'doctor') {
+					localStorage.setItem('doctorName', fullName)
+				}
 				
+				const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
 				setTimeout(() => {
-					window.location.href = 'patient-dashboard.html'
+					window.location.href = dest
 				}, 3000)
-			} else if (role === 'doctor') {
+				
+			} catch (error) {
+				console.error('Registration failed:', error)
 				if (signupNote) {
 					signupNote.innerHTML = `
-						<div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9; margin-top: 20px; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);">
-							<h4 style="margin: 0 0 12px; color: #0ea5e9; font-size: 20px;">👨‍⚕️ Welcome, Dr. ${fullName}!</h4>
-							<p style="margin: 0; font-size: 16px; color: #64748b;">Account created successfully. Redirecting to dashboard...</p>
-							<div style="margin-top: 16px;">
-								<div style="width: 100%; height: 4px; background: #e0f2fe; border-radius: 2px; overflow: hidden;">
-									<div style="width: 0%; height: 100%; background: linear-gradient(90deg, #0ea5e9, #0284c7); border-radius: 2px; animation: progressBar 3s linear forwards;"></div>
-								</div>
-							</div>
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ ${error.message || 'Registration failed. Please try again.'}</p>
 						</div>
 					`
 					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
-				
-				// Store doctor details in localStorage for demo purposes
-				localStorage.setItem('doctorName', fullName)
-				localStorage.setItem('doctorEmail', email)
-				localStorage.setItem('doctorPhone', phone)
-				
-				setTimeout(() => {
-					window.location.href = 'doctor-dashboard.html'
-				}, 3000)
-			}
-			
-			// Reset button state
-			setTimeout(() => {
+			} finally {
+				// Reset button state
 				if (submitBtn) {
 					submitBtn.textContent = 'Sign Up'
 					submitBtn.disabled = false
 					submitBtn.style.opacity = '1'
 				}
-			}, 1000)
+			}
 		})
 	}
 
