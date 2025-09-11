@@ -183,8 +183,95 @@
       </div>
     </footer>
 
+    <script src="api.js"></script>
     <script src="script.js"></script>
     <script>
+      // Load doctor dashboard data from API
+      window.addEventListener('DOMContentLoaded', async function() {
+        try {
+          // Check if user is authenticated
+          if (!window.meducoAPI.isAuthenticated()) {
+            window.location.href = 'login.html'
+            return
+          }
+
+          // Get user data
+          const userData = window.meducoAPI.getUserData()
+          if (userData && userData.role !== 'doctor') {
+            window.location.href = 'login.html'
+            return
+          }
+
+          // Load dashboard data from API
+          const dashboardData = await window.meducoAPI.getDoctorDashboard()
+          
+          if (dashboardData.success) {
+            const data = dashboardData.data
+            
+            // Update doctor name
+            if (data.doctor) {
+              document.getElementById('doctorName').textContent = `Dr. ${data.doctor.first_name} ${data.doctor.last_name}`
+            }
+
+            // Update overview cards
+            if (data.totalPatients !== undefined) {
+              const totalPatientsCard = document.querySelector('.overview-card:nth-child(1) .overview-value')
+              if (totalPatientsCard) {
+                totalPatientsCard.textContent = data.totalPatients
+              }
+            }
+
+            if (data.todayAppointments && data.todayAppointments.length !== undefined) {
+              const todayAppointmentsCard = document.querySelector('.overview-card:nth-child(2) .overview-value')
+              if (todayAppointmentsCard) {
+                todayAppointmentsCard.textContent = data.todayAppointments.length
+              }
+            }
+
+            if (data.pendingAppointments !== undefined) {
+              const urgentAlertsCard = document.querySelector('.overview-card:nth-child(3) .overview-value')
+              if (urgentAlertsCard) {
+                urgentAlertsCard.textContent = data.pendingAppointments
+              }
+            }
+
+            // Update today's appointments table
+            if (data.todayAppointments && data.todayAppointments.length > 0) {
+              const appointmentsTable = document.querySelector('table tbody')
+              if (appointmentsTable) {
+                appointmentsTable.innerHTML = data.todayAppointments.map(appointment => `
+                  <tr>
+                    <td>${appointment.appointment_time}</td>
+                    <td>${appointment.first_name} ${appointment.last_name}</td>
+                    <td>${appointment.reason || appointment.type}</td>
+                  </tr>
+                `).join('')
+              }
+            }
+
+            // Update AI insights
+            const insightsList = document.querySelector('.card:last-child ul')
+            if (insightsList && data.pendingAppointments > 0) {
+              insightsList.innerHTML = `
+                <li>${data.pendingAppointments} appointments pending review</li>
+                <li>Recent patient activity looks normal</li>
+              `
+            }
+          }
+        } catch (error) {
+          console.error('Error loading dashboard:', error)
+          if (error.message.includes('Token expired') || error.message.includes('Invalid token')) {
+            window.location.href = 'login.html'
+          }
+        }
+
+        // Fallback to localStorage for compatibility
+        const doctorName = localStorage.getItem('doctorName')
+        if (doctorName && document.getElementById('doctorName').textContent === 'Doctor') {
+          document.getElementById('doctorName').textContent = doctorName
+        }
+      })
+
       // Simple chart rendering using Canvas
       function drawAppointmentChart() {
         const canvas = document.getElementById('appointmentChart');

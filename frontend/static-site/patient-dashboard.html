@@ -187,19 +187,109 @@
       </div>
     </footer>
 
+    <script src="api.js"></script>
     <script src="script.js"></script>
     <script>
-      // Display patient ID if it exists
-      window.addEventListener('DOMContentLoaded', function() {
+      // Load patient dashboard data from API
+      window.addEventListener('DOMContentLoaded', async function() {
+        try {
+          // Check if user is authenticated
+          if (!window.meducoAPI.isAuthenticated()) {
+            window.location.href = 'login.html'
+            return
+          }
+
+          // Get user data
+          const userData = window.meducoAPI.getUserData()
+          if (userData && userData.role !== 'patient') {
+            window.location.href = 'login.html'
+            return
+          }
+
+          // Load dashboard data from API
+          const dashboardData = await window.meducoAPI.getPatientDashboard()
+          
+          if (dashboardData.success) {
+            const data = dashboardData.data
+            
+            // Update patient name and ID
+            if (data.patient) {
+              document.getElementById('patientName').textContent = `${data.patient.first_name} ${data.patient.last_name}`
+              document.getElementById('patientIDDisplay').style.display = 'block'
+              document.getElementById('patientID').textContent = data.patient.patient_id
+            }
+
+            // Update appointments table
+            if (data.appointments && data.appointments.length > 0) {
+              const appointmentsTable = document.querySelector('#appointments tbody')
+              if (appointmentsTable) {
+                appointmentsTable.innerHTML = data.appointments.map(appointment => `
+                  <tr>
+                    <td>${appointment.appointment_date}</td>
+                    <td>${appointment.appointment_time}</td>
+                    <td>Dr. ${appointment.doctor_first_name} ${appointment.doctor_last_name}</td>
+                    <td>${appointment.specialization}</td>
+                  </tr>
+                `).join('')
+              }
+            }
+
+            // Update health metrics
+            if (data.healthRecords && data.healthRecords.length > 0) {
+              const healthMetrics = document.querySelector('.card:nth-of-type(2) > div')
+              if (healthMetrics) {
+                const bloodSugar = data.healthRecords.find(r => r.record_type === 'blood_sugar')
+                const bloodPressure = data.healthRecords.find(r => r.record_type === 'blood_pressure')
+                const weight = data.healthRecords.find(r => r.record_type === 'weight')
+
+                healthMetrics.innerHTML = `
+                  ${bloodSugar ? `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                      <span style="color: var(--text);">Blood Glucose (Fasting)</span>
+                      <span style="font-weight: 600; color: #059669;">${bloodSugar.value} ${bloodSugar.unit}</span>
+                    </div>
+                  ` : ''}
+                  ${bloodPressure ? `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                      <span style="color: var(--text);">Blood Pressure</span>
+                      <span style="font-weight: 600; color: #dc2626;">${bloodPressure.value} ${bloodPressure.unit}</span>
+                    </div>
+                  ` : ''}
+                  ${weight ? `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                      <span style="color: var(--text);">Weight</span>
+                      <span style="font-weight: 600; color: var(--text);">${weight.value} ${weight.unit}</span>
+                    </div>
+                  ` : ''}
+                `
+              }
+            }
+
+            // Update unread message count
+            if (data.unreadMessageCount > 0) {
+              const messageButton = document.querySelector('a[href="message-doctor.html"]')
+              if (messageButton) {
+                messageButton.innerHTML += ` <span style="background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 12px; margin-left: 5px;">${data.unreadMessageCount}</span>`
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error loading dashboard:', error)
+          if (error.message.includes('Token expired') || error.message.includes('Invalid token')) {
+            window.location.href = 'login.html'
+          }
+        }
+
+        // Fallback to localStorage for compatibility
         const patientID = localStorage.getItem('patientID')
         const patientName = localStorage.getItem('patientName')
         
-        if (patientID) {
+        if (patientID && !document.getElementById('patientID').textContent) {
           document.getElementById('patientIDDisplay').style.display = 'block'
           document.getElementById('patientID').textContent = patientID
         }
         
-        if (patientName) {
+        if (patientName && document.getElementById('patientName').textContent === 'Jane Cooper') {
           document.getElementById('patientName').textContent = patientName
         }
       })
