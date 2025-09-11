@@ -20,12 +20,12 @@
 	}
 
 
-	// Enhanced patient ID generation with animation
+	// Simple patient ID generation
 	function generatePatientID() {
-		const timestamp = Date.now().toString(36)
-		const random = Math.random().toString(36).substr(2, 5)
+		// Generate a simple 4-digit number
+		const randomNumber = Math.floor(1000 + Math.random() * 9000)
 		const prefix = 'PAT'
-		return `${prefix}${timestamp}${random}`.toUpperCase()
+		return `${prefix}${randomNumber}`
 	}
 
 	// Enhanced role switching with smooth transitions (works for both login and signup)
