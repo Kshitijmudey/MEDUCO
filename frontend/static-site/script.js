@@ -19,65 +19,6 @@
 		})
 	}
 
-	// Enhanced auth mode toggle with smooth transitions
-	const authTabs = document.getElementById('authTabs')
-	const modeInput = document.getElementById('modeInput')
-	const signupNameWrap = document.getElementById('signupNameWrap')
-	const confirmWrap = document.getElementById('confirmWrap')
-	const submitBtn = document.getElementById('submitBtn')
-	if (authTabs && modeInput && signupNameWrap && confirmWrap && submitBtn) {
-		authTabs.addEventListener('click', (e) => {
-			const target = e.target
-			if (!(target instanceof HTMLElement)) return
-			const mode = target.getAttribute('data-mode')
-			if (!mode) return
-			
-			modeInput.value = mode
-			
-			// Enhanced button transitions
-			for (const btn of authTabs.querySelectorAll('[data-mode]')) {
-				btn.classList.remove('btn-primary')
-				btn.classList.add('btn-outline')
-				btn.style.transform = 'scale(0.95)'
-			}
-			
-			target.classList.remove('btn-outline')
-			target.classList.add('btn-primary')
-			target.style.transform = 'scale(1.05)'
-			
-			const isSignup = mode === 'signup'
-			
-			// Smooth show/hide animations
-			if (isSignup) {
-				signupNameWrap.style.display = ''
-				signupNameWrap.style.opacity = '0'
-				signupNameWrap.style.transform = 'translateY(-10px)'
-				setTimeout(() => {
-					signupNameWrap.style.opacity = '1'
-					signupNameWrap.style.transform = 'translateY(0)'
-				}, 50)
-				
-				confirmWrap.style.display = ''
-				confirmWrap.style.opacity = '0'
-				confirmWrap.style.transform = 'translateY(-10px)'
-				setTimeout(() => {
-					confirmWrap.style.opacity = '1'
-					confirmWrap.style.transform = 'translateY(0)'
-				}, 150)
-			} else {
-				signupNameWrap.style.opacity = '0'
-				signupNameWrap.style.transform = 'translateY(-10px)'
-				confirmWrap.style.opacity = '0'
-				confirmWrap.style.transform = 'translateY(-10px)'
-				setTimeout(() => {
-					signupNameWrap.style.display = 'none'
-					confirmWrap.style.display = 'none'
-				}, 200)
-			}
-			
-			submitBtn.textContent = isSignup ? 'Sign Up' : 'Sign In'
-		})
-	}
 
 	// Enhanced patient ID generation with animation
 	function generatePatientID() {
@@ -87,11 +28,15 @@
 		return `${prefix}${timestamp}${random}`.toUpperCase()
 	}
 
-	// Enhanced login role switching with smooth transitions
+	// Enhanced role switching with smooth transitions (works for both login and signup)
 	const roleTabs = document.getElementById('roleTabs')
 	const roleInput = document.getElementById('roleInput')
 	const loginForm = document.getElementById('loginForm')
+	const signupForm = document.getElementById('signupForm')
 	const loginNote = document.getElementById('loginNote')
+	const signupNote = document.getElementById('signupNote')
+	const currentForm = loginForm || signupForm
+	
 	if (roleTabs && roleInput) {
 		roleTabs.addEventListener('click', (e) => {
 			const target = e.target
@@ -113,36 +58,108 @@
 			target.style.transform = 'scale(1.05)'
 			
 			// Add subtle animation to form
-			if (loginForm) {
-				loginForm.style.animation = 'pulse 0.3s ease'
+			if (currentForm) {
+				currentForm.style.animation = 'pulse 0.3s ease'
 				setTimeout(() => {
-					loginForm.style.animation = ''
+					currentForm.style.animation = ''
 				}, 300)
 			}
 		})
 	}
 
-	// Enhanced form submission with better feedback
+	// Enhanced login form submission (sign-in only)
 	if (loginForm) {
 		loginForm.addEventListener('submit', (e) => {
 			e.preventDefault()
 			const data = new FormData(loginForm)
 			const role = String(data.get('role') || 'patient')
-			const mode = String(data.get('mode') || 'signin')
+			const submitBtn = loginForm.querySelector('#submitBtn')
 			
 			// Enhanced loading state
 			if (submitBtn) {
-				submitBtn.textContent = 'Processing...'
+				submitBtn.textContent = 'Signing in...'
 				submitBtn.disabled = true
 				submitBtn.style.opacity = '0.7'
 			}
 			
-			if (mode === 'signup' && role === 'patient') {
-				const patientID = generatePatientID()
-				const fullName = data.get('fullName') || 'New Patient'
-				
+			if (role === 'doctor') {
+				// For existing doctor sign-ins, we'll use a demo name
+				// In a real app, this would come from the database
+				const demoDoctorName = 'Sarah Johnson'
+				localStorage.setItem('doctorName', demoDoctorName)
 				if (loginNote) {
 					loginNote.innerHTML = `
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
+							<p style="margin: 0; color: #059669; font-weight: 600;">✅ Signed in successfully. Redirecting...</p>
+						</div>
+					`
+					loginNote.style.animation = 'fadeInUp 0.6s ease'
+				}
+			} else if (role === 'patient') {
+				// For existing patient sign-ins, we'll use a demo name
+				// In a real app, this would come from the database
+				const demoPatientName = 'Jane Cooper'
+				localStorage.setItem('patientName', demoPatientName)
+				if (loginNote) {
+					loginNote.innerHTML = `
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
+							<p style="margin: 0; color: #059669; font-weight: 600;">✅ Signed in successfully. Redirecting...</p>
+						</div>
+					`
+					loginNote.style.animation = 'fadeInUp 0.6s ease'
+				}
+			}
+			
+			const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
+			setTimeout(() => { window.location.href = dest }, 1500)
+			
+			// Reset button state
+			setTimeout(() => {
+				if (submitBtn) {
+					submitBtn.textContent = 'Sign In'
+					submitBtn.disabled = false
+					submitBtn.style.opacity = '1'
+				}
+			}, 1000)
+		})
+	}
+
+	// Enhanced signup form submission
+	if (signupForm) {
+		signupForm.addEventListener('submit', (e) => {
+			e.preventDefault()
+			const data = new FormData(signupForm)
+			const role = String(data.get('role') || 'patient')
+			const fullName = String(data.get('fullName') || '')
+			const password = String(data.get('password') || '')
+			const confirm = String(data.get('confirm') || '')
+			const submitBtn = signupForm.querySelector('#submitBtn')
+			
+			// Validate password confirmation
+			if (password !== confirm) {
+				if (signupNote) {
+					signupNote.innerHTML = `
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Passwords do not match!</p>
+						</div>
+					`
+					signupNote.style.animation = 'fadeInUp 0.6s ease'
+				}
+				return
+			}
+			
+			// Enhanced loading state
+			if (submitBtn) {
+				submitBtn.textContent = 'Creating account...'
+				submitBtn.disabled = true
+				submitBtn.style.opacity = '0.7'
+			}
+			
+			if (role === 'patient') {
+				const patientID = generatePatientID()
+				
+				if (signupNote) {
+					signupNote.innerHTML = `
 						<div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9; margin-top: 20px; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);">
 							<h4 style="margin: 0 0 12px; color: #0ea5e9; font-size: 20px;">🎉 Welcome, ${fullName}!</h4>
 							<p style="margin: 0 0 16px; color: #0ea5e9; font-size: 16px;">Your Patient ID: <strong style="font-size: 22px; background: linear-gradient(135deg, #0ea5e9, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${patientID}</strong></p>
@@ -154,7 +171,7 @@
 							</div>
 						</div>
 					`
-					loginNote.style.animation = 'fadeInUp 0.6s ease'
+					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
 				
 				// Store patient ID in localStorage for demo purposes
@@ -164,11 +181,9 @@
 				setTimeout(() => {
 					window.location.href = 'patient-dashboard.html'
 				}, 3000)
-			} else if (mode === 'signup' && role === 'doctor') {
-				const fullName = data.get('fullName') || 'New Doctor'
-				
-				if (loginNote) {
-					loginNote.innerHTML = `
+			} else if (role === 'doctor') {
+				if (signupNote) {
+					signupNote.innerHTML = `
 						<div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9; margin-top: 20px; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);">
 							<h4 style="margin: 0 0 12px; color: #0ea5e9; font-size: 20px;">👨‍⚕️ Welcome, Dr. ${fullName}!</h4>
 							<p style="margin: 0; font-size: 16px; color: #64748b;">Account created successfully. Redirecting to dashboard...</p>
@@ -179,7 +194,7 @@
 							</div>
 						</div>
 					`
-					loginNote.style.animation = 'fadeInUp 0.6s ease'
+					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
 				
 				// Store doctor name in localStorage for demo purposes
@@ -188,52 +203,12 @@
 				setTimeout(() => {
 					window.location.href = 'doctor-dashboard.html'
 				}, 3000)
-			} else {
-				if (mode === 'signin' && role === 'doctor') {
-					// For existing doctor sign-ins, we'll use a demo name
-					// In a real app, this would come from the database
-					const demoDoctorName = 'Sarah Johnson'
-					localStorage.setItem('doctorName', demoDoctorName)
-					if (loginNote) {
-						loginNote.innerHTML = `
-							<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
-								<p style="margin: 0; color: #059669; font-weight: 600;">✅ Signed in successfully. Redirecting...</p>
-							</div>
-						`
-						loginNote.style.animation = 'fadeInUp 0.6s ease'
-					}
-				} else if (mode === 'signin' && role === 'patient') {
-					// For existing patient sign-ins, we'll use a demo name
-					// In a real app, this would come from the database
-					const demoPatientName = 'Jane Cooper'
-					localStorage.setItem('patientName', demoPatientName)
-					if (loginNote) {
-						loginNote.innerHTML = `
-							<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
-								<p style="margin: 0; color: #059669; font-weight: 600;">✅ Signed in successfully. Redirecting...</p>
-							</div>
-						`
-						loginNote.style.animation = 'fadeInUp 0.6s ease'
-					}
-				} else {
-					if (loginNote) {
-						loginNote.innerHTML = `
-							<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; border: 2px solid #f59e0b; margin-top: 16px;">
-								<p style="margin: 0; color: #d97706; font-weight: 600;">${mode === 'signup' ? 'Account created. ' : 'Signed in. '}Redirecting...</p>
-							</div>
-						`
-						loginNote.style.animation = 'fadeInUp 0.6s ease'
-					}
-				}
-				
-				const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
-				setTimeout(() => { window.location.href = dest }, 1500)
 			}
 			
 			// Reset button state
 			setTimeout(() => {
 				if (submitBtn) {
-					submitBtn.textContent = mode === 'signup' ? 'Sign Up' : 'Sign In'
+					submitBtn.textContent = 'Sign Up'
 					submitBtn.disabled = false
 					submitBtn.style.opacity = '1'
 				}

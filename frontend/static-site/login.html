@@ -29,33 +29,26 @@
             </a>
           </div>
           <h1 class="text-responsive-3xl">Login</h1>
-          <p class="muted text-responsive-base">Choose a role and sign in or create a new account.</p>
+          <p class="muted text-responsive-base">Choose a role and sign in to your account.</p>
           <div class="card">
             <div class="row" id="roleTabs" style="margin-top:8px">
               <button class="btn btn-outline text-responsive-base" data-role="patient">Patient</button>
               <button class="btn btn-outline text-responsive-base" data-role="doctor">Doctor</button>
             </div>
             <form class="form" id="loginForm" style="margin-top:12px">
-              <div id="signupNameWrap" style="display:none">
-                <input class="input text-responsive-base" name="fullName" placeholder="Full name">
-              </div>
               <input class="input text-responsive-base" name="email" type="email" placeholder="Email" required>
               <input class="input text-responsive-base" name="password" type="password" placeholder="Password" required>
-              <div id="confirmWrap" style="display:none">
-                <input class="input text-responsive-base" name="confirm" type="password" placeholder="Confirm password">
-              </div>
               <input type="hidden" name="role" id="roleInput" value="patient">
-              <input type="hidden" name="mode" id="modeInput" value="signin">
               <button class="btn btn-primary text-responsive-base" id="submitBtn" type="submit">Sign In</button>
               <div style="text-align: center; margin-top: 12px;">
                 <a href="#" onclick="showForgotPassword()" style="color: var(--brand); text-decoration: none; font-size: 14px;">Forgot Password?</a>
               </div>
+              <div style="text-align: center; margin-top: 12px;">
+                <span style="color: var(--text-secondary); font-size: 14px;">Don't have an account? </span>
+                <a href="signup.html" style="color: var(--brand); text-decoration: none; font-size: 14px; font-weight: 600;">Create new account</a>
+              </div>
               <div class="form-note" id="loginNote" role="status" aria-live="polite"></div>
             </form>
-          </div>
-          <div class="row" id="authTabs" style="margin-top:12px; justify-content:center">
-            <button class="btn btn-primary text-responsive-base" data-mode="signin">Sign In</button>
-            <button class="btn btn-outline text-responsive-base" data-mode="signup">Sign Up</button>
           </div>
         </div>
       </section>
