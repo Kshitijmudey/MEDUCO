@@ -13,7 +13,10 @@
     <header class="site-header">
       <div class="container header-inner">
         <a href="index.html" class="brand">MEDUCO</a>
-        <nav class="nav" id="nav">
+        <nav class="nav" id="nav" role="navigation" aria-label="Patient navigation">
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light theme">
+            <span class="theme-toggle-icon">🌙</span>
+          </button>
           <a href="login.html">Logout</a>
         </nav>
         <button aria-label="Toggle menu" class="nav-toggle responsive-show" id="navToggle">
@@ -25,13 +28,25 @@
     <main>
       <section class="section">
         <div class="container">
-          <h1 class="text-responsive-3xl">Welcome, <span id="patientName">Jane Cooper</span></h1>
-          <div id="patientIDDisplay" style="display: none; margin-bottom: 16px;">
-            <p style="margin: 0; color: var(--brand); font-size: 18px; font-weight: 600;" class="text-responsive-lg">
-              Patient ID: <span id="patientID" style="font-family: monospace; color: var(--text); font-weight: 700; background: transparent; border: none; padding: 0; margin: 0;"></span>
-            </p>
+          <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h1 class="text-responsive-3xl" style="margin: 0;">Welcome, <span id="patientName">Jane Cooper</span></h1>
+              <div id="patientIDDisplay" style="display: none; margin: 8px 0 0;">
+                <p style="margin: 0; color: var(--brand); font-size: 16px; font-weight: 600;" class="text-responsive-base">
+                  Patient ID: <span id="patientID" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace; color: var(--text); font-weight: 700; background: var(--brand-light); padding: 4px 8px; border-radius: 6px; font-size: 14px;"></span>
+                </p>
+              </div>
+              <p class="muted text-responsive-base" style="margin: 8px 0 0;">Here's your personalized health overview and reminders.</p>
+            </div>
+            <div class="dashboard-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="btn btn-outline" onclick="refreshDashboard()" title="Refresh dashboard data">
+                <span style="margin-right: 6px;">🔄</span>Refresh
+              </button>
+              <button class="btn btn-primary" onclick="showQuickActions()" title="Quick actions menu">
+                <span style="margin-right: 6px;">⚡</span>Quick Actions
+              </button>
+            </div>
           </div>
-          <p class="muted text-responsive-base">Here's your personalized health overview and reminders.</p>
           
           <!-- Daily Reminders Section -->
           <div class="card" style="margin-bottom: 24px; border-left: 4px solid #ef4444;">
@@ -302,6 +317,179 @@
           sendMessage();
         }
       });
+
+      // Enhanced Dashboard Functions
+      function refreshDashboard() {
+        const refreshBtn = document.querySelector('button[onclick="refreshDashboard()"]');
+        if (refreshBtn) {
+          const originalText = refreshBtn.innerHTML;
+          refreshBtn.innerHTML = '<span style="margin-right: 6px;">⏳</span>Refreshing...';
+          refreshBtn.disabled = true;
+          
+          // Simulate refresh
+          setTimeout(() => {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+            
+            // Show success message
+            const message = document.createElement('div');
+            message.style.cssText = `
+              position: fixed;
+              top: 100px;
+              right: 20px;
+              background: var(--success);
+              color: white;
+              padding: 12px 20px;
+              border-radius: 8px;
+              box-shadow: var(--shadow-lg);
+              z-index: 1000;
+              animation: slideInRight 0.3s ease;
+            `;
+            message.textContent = '✅ Dashboard refreshed successfully!';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+              message.style.animation = 'slideOutRight 0.3s ease';
+              setTimeout(() => message.remove(), 300);
+            }, 2000);
+          }, 1500);
+        }
+      }
+
+      function showQuickActions() {
+        const modal = document.createElement('div');
+        modal.id = 'quickActionsModal';
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(8px);
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: fadeIn 0.3s ease;
+        `;
+        
+        modal.innerHTML = `
+          <div style="background: var(--card); padding: 32px; border-radius: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideIn 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <h2 style="margin: 0; color: var(--text);">Quick Actions</h2>
+              <button onclick="closeQuickActions()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary); padding: 4px;">×</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+              <a href="log-blood-sugar.html" class="quick-action-card" style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--surface); border-radius: 12px; text-decoration: none; color: var(--text); transition: all 0.2s ease; border: 1px solid var(--border);">
+                <span style="font-size: 24px;">🩸</span>
+                <div>
+                  <div style="font-weight: 600;">Log Blood Sugar</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Track glucose levels</div>
+                </div>
+              </a>
+              
+              <a href="request-appointment.html" class="quick-action-card" style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--surface); border-radius: 12px; text-decoration: none; color: var(--text); transition: all 0.2s ease; border: 1px solid var(--border);">
+                <span style="font-size: 24px;">📅</span>
+                <div>
+                  <div style="font-weight: 600;">Request Appointment</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Schedule with doctor</div>
+                </div>
+              </a>
+              
+              <a href="message-doctor.html" class="quick-action-card" style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--surface); border-radius: 12px; text-decoration: none; color: var(--text); transition: all 0.2s ease; border: 1px solid var(--border);">
+                <span style="font-size: 24px;">💬</span>
+                <div>
+                  <div style="font-weight: 600;">Message Doctor</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Secure messaging</div>
+                </div>
+              </a>
+              
+              <a href="patient-care-plans.html" class="quick-action-card" style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--surface); border-radius: 12px; text-decoration: none; color: var(--text); transition: all 0.2s ease; border: 1px solid var(--border);">
+                <span style="font-size: 24px;">📋</span>
+                <div>
+                  <div style="font-weight: 600;">View Care Plans</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Treatment progress</div>
+                </div>
+              </a>
+              
+              <a href="download-records.html" class="quick-action-card" style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--surface); border-radius: 12px; text-decoration: none; color: var(--text); transition: all 0.2s ease; border: 1px solid var(--border);">
+                <span style="font-size: 24px;">📄</span>
+                <div>
+                  <div style="font-weight: 600;">Download Records</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Medical history</div>
+                </div>
+              </a>
+              
+              <button onclick="showEmergencyContacts()" class="quick-action-card" style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--surface); border-radius: 12px; color: var(--text); transition: all 0.2s ease; border: 1px solid var(--border); cursor: pointer;">
+                <span style="font-size: 24px;">🚨</span>
+                <div>
+                  <div style="font-weight: 600;">Emergency Contacts</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Quick access</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeQuickActions();
+          }
+        });
+        
+        // Add hover effects to cards
+        const cards = modal.querySelectorAll('.quick-action-card');
+        cards.forEach(card => {
+          card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-2px)';
+            card.style.boxShadow = 'var(--shadow-md)';
+            card.style.borderColor = 'var(--brand)';
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '';
+            card.style.borderColor = 'var(--border)';
+          });
+        });
+      }
+
+      function closeQuickActions() {
+        const modal = document.getElementById('quickActionsModal');
+        if (modal) {
+          modal.style.animation = 'fadeOut 0.3s ease';
+          setTimeout(() => modal.remove(), 300);
+        }
+      }
+
+      function showEmergencyContacts() {
+        alert('Emergency Contacts:\n\n🚨 Emergency: 911\n🏥 Hospital: (555) 123-4567\n👨‍⚕️ Dr. Smith: (555) 234-5678\n🚑 Urgent Care: (555) 345-6789');
+      }
+
+      // Add CSS animations
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
     </script>
   </body>
 </html> 
