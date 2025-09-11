@@ -4,6 +4,58 @@
 	const year = document.getElementById('year')
 	if (year) year.textContent = new Date().getFullYear().toString()
 
+	// Enhanced Theme Toggle Functionality
+	function initThemeToggle() {
+		const themeToggle = document.getElementById('themeToggle')
+		const themeIcon = document.querySelector('.theme-toggle-icon')
+		
+		if (!themeToggle) return
+		
+		// Check for saved theme or default to system preference
+		const savedTheme = localStorage.getItem('theme')
+		const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+		const currentTheme = savedTheme || (systemDarkMode ? 'dark' : 'light')
+		
+		// Apply initial theme
+		document.documentElement.setAttribute('data-theme', currentTheme)
+		updateThemeIcon(currentTheme)
+		
+		// Theme toggle event listener
+		themeToggle.addEventListener('click', () => {
+			const currentTheme = document.documentElement.getAttribute('data-theme')
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+			
+			document.documentElement.setAttribute('data-theme', newTheme)
+			localStorage.setItem('theme', newTheme)
+			updateThemeIcon(newTheme)
+			
+			// Add smooth transition effect
+			document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease'
+			setTimeout(() => {
+				document.body.style.transition = ''
+			}, 300)
+		})
+		
+		// Update theme icon based on current theme
+		function updateThemeIcon(theme) {
+			if (themeIcon) {
+				themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙'
+				themeToggle.setAttribute('aria-label', 
+					theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
+				)
+			}
+		}
+		
+		// Listen for system theme changes
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+			if (!localStorage.getItem('theme')) {
+				const newTheme = e.matches ? 'dark' : 'light'
+				document.documentElement.setAttribute('data-theme', newTheme)
+				updateThemeIcon(newTheme)
+			}
+		})
+	}
+
 	// Enhanced contact form with animations
 	const form = document.getElementById('contactForm')
 	const note = document.getElementById('formNote')
@@ -877,6 +929,9 @@
 
 // Initialize all enhancements when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
+	
+	// Initialize theme toggle first
+	initThemeToggle()
 	
 	// Initialize basic enhancements
 	animateOnScroll()

@@ -8,14 +8,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>MEDUCO Management</title>
     <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="MEDUCO - Revolutionary AI-Powered Patient Care Management Platform for healthcare providers and patients">
+    <meta name="keywords" content="healthcare, patient management, AI, medical records, appointments, care plans">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
   <body>
     <header class="site-header">
       <div class="container header-inner">
         <a href="index.html" class="brand">MEDUCO</a>
-        <nav class="nav" id="nav">
-          <a href="login.html">Login</a>
-          <a href="login.html">Sign Up</a>
+        <nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light theme">
+            <span class="theme-toggle-icon">🌙</span>
+          </button>
+          <a href="login.html" aria-label="Login to your MEDUCO account">Login</a>
+          <a href="login.html" aria-label="Create a new MEDUCO account">Sign Up</a>
         </nav>
         <button aria-label="Toggle menu" class="nav-toggle responsive-show" id="navToggle">
           <span></span><span></span><span></span>
@@ -23,33 +31,33 @@
       </div>
     </header>
 
-    <main>
-      <section class="hero">
+    <main role="main">
+      <section class="hero" aria-labelledby="hero-title">
         <div class="container hero-inner">
           <div class="hero-text">
-            <h1 class="text-responsive-4xl">MEDUCO</h1>
-            <p class="hero-subtitle text-responsive-lg">Revolutionary AI-Powered Patient Care Management Platform</p>
+            <h1 id="hero-title" class="text-responsive-4xl">MEDUCO</h1>
+            <p class="hero-subtitle text-responsive-lg" role="doc-subtitle">Revolutionary AI-Powered Patient Care Management Platform</p>
             <p class="hero-description text-responsive-base">Transform healthcare delivery with intelligent automation, predictive analytics, and personalized patient care. MEDUCO combines cutting-edge artificial intelligence with comprehensive healthcare management tools to enhance patient outcomes and streamline medical operations.</p>
           </div>
         </div>
       </section>
 
-      <section class="features">
+      <section class="features" aria-labelledby="features-title">
         <div class="container">
-          <h2 class="text-responsive-3xl space-responsive-lg">Why Choose MEDUCO?</h2>
-          <div class="grid-3">
-            <div class="feature-card">
-              <div class="feature-icon">🤖</div>
+          <h2 id="features-title" class="text-responsive-3xl space-responsive-lg">Why Choose MEDUCO?</h2>
+          <div class="grid-3" role="list" aria-label="MEDUCO features">
+            <div class="feature-card" role="listitem">
+              <div class="feature-icon" aria-hidden="true">🤖</div>
               <h3 class="text-responsive-xl">AI-Powered Insights</h3>
               <p class="text-responsive-base">Advanced machine learning algorithms analyze patient data to provide predictive health insights, early warning systems, and personalized treatment recommendations.</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-icon">📱</div>
+            <div class="feature-card" role="listitem">
+              <div class="feature-icon" aria-hidden="true">📱</div>
               <h3 class="text-responsive-xl">Smart Patient Management</h3>
               <p class="text-responsive-base">Comprehensive patient profiles, automated reminders, medication tracking, and real-time health monitoring for proactive care management.</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-icon">⚡</div>
+            <div class="feature-card" role="listitem">
+              <div class="feature-icon" aria-hidden="true">⚡</div>
               <h3 class="text-responsive-xl">Efficient Workflow</h3>
               <p class="text-responsive-base">Streamlined appointment scheduling, automated care plan generation, and intelligent resource allocation to maximize healthcare efficiency.</p>
             </div>
