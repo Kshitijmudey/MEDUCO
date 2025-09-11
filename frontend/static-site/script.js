@@ -613,30 +613,6 @@
 		})
 	}
 
-	// Enhanced theme support
-	function enhanceThemeSupport() {
-		// Check for system theme preference
-		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
-		
-		function updateTheme(e) {
-			if (e.matches) {
-				document.documentElement.classList.add('dark-theme')
-			} else {
-				document.documentElement.classList.remove('dark-theme')
-			}
-		}
-		
-		prefersDark.addListener(updateTheme)
-		updateTheme(prefersDark)
-		
-		// Add theme toggle functionality
-		const themeToggle = document.getElementById('themeToggle')
-		if (themeToggle) {
-			themeToggle.addEventListener('click', () => {
-				document.documentElement.classList.toggle('dark-theme')
-			})
-		}
-	}
 
 	// Enhanced error handling
 	function enhanceErrorHandling() {
@@ -898,45 +874,9 @@
 		})
 	}
 
-	// Theme Management
-function initTheme() {
-	const themeToggle = document.getElementById('themeToggle')
-	const savedTheme = localStorage.getItem('theme') || 'dark'
-	
-	// Set initial theme
-	document.documentElement.setAttribute('data-theme', savedTheme)
-	updateThemeIcon(savedTheme)
-	
-	if (themeToggle) {
-		themeToggle.addEventListener('click', function() {
-			const currentTheme = document.documentElement.getAttribute('data-theme')
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
-			
-			// Update theme
-			document.documentElement.setAttribute('data-theme', newTheme)
-			localStorage.setItem('theme', newTheme)
-			updateThemeIcon(newTheme)
-			
-			// Add transition effect
-			document.body.style.transition = 'all 0.3s ease'
-			setTimeout(() => {
-				document.body.style.transition = ''
-			}, 300)
-		})
-	}
-}
-
-function updateThemeIcon(theme) {
-	const themeIcon = document.querySelector('.theme-icon')
-	if (themeIcon) {
-		themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️'
-	}
-}
 
 // Initialize all enhancements when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-	// Initialize theme
-	initTheme()
 	
 	// Initialize basic enhancements
 	animateOnScroll()
@@ -950,7 +890,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		enhanceResponsiveAnimations()
 		enhancePerformance()
 		enhanceAccessibility()
-		enhanceThemeSupport()
 		enhanceErrorHandling()
 		enhanceAnalytics()
 		enhanceMobileExperience()
