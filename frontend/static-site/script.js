@@ -28,6 +28,30 @@
 		return `${prefix}${timestamp}${random}`.toUpperCase()
 	}
 
+	// Password toggle functionality
+	window.togglePassword = function(fieldName) {
+		const passwordField = document.querySelector(`input[name="${fieldName}"]`)
+		const iconElement = document.getElementById(`${fieldName}-icon`)
+		
+		if (passwordField && iconElement) {
+			if (passwordField.type === 'password') {
+				passwordField.type = 'text'
+				iconElement.textContent = '🙈'
+				iconElement.setAttribute('aria-label', 'Hide password')
+			} else {
+				passwordField.type = 'password'
+				iconElement.textContent = '👁️'
+				iconElement.setAttribute('aria-label', 'Show password')
+			}
+			
+			// Add subtle animation
+			iconElement.style.transform = 'scale(0.8)'
+			setTimeout(() => {
+				iconElement.style.transform = 'scale(1)'
+			}, 150)
+		}
+	}
+
 	// Enhanced role switching with smooth transitions (works for both login and signup)
 	const roleTabs = document.getElementById('roleTabs')
 	const roleInput = document.getElementById('roleInput')
@@ -131,9 +155,25 @@
 			const data = new FormData(signupForm)
 			const role = String(data.get('role') || 'patient')
 			const fullName = String(data.get('fullName') || '')
+			const email = String(data.get('email') || '')
+			const phone = String(data.get('phone') || '')
 			const password = String(data.get('password') || '')
 			const confirm = String(data.get('confirm') || '')
 			const submitBtn = signupForm.querySelector('#submitBtn')
+			
+			// Validate phone number format
+			const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
+			if (!phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''))) {
+				if (signupNote) {
+					signupNote.innerHTML = `
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Please enter a valid phone number!</p>
+						</div>
+					`
+					signupNote.style.animation = 'fadeInUp 0.6s ease'
+				}
+				return
+			}
 			
 			// Validate password confirmation
 			if (password !== confirm) {
@@ -174,9 +214,11 @@
 					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
 				
-				// Store patient ID in localStorage for demo purposes
+				// Store patient ID and details in localStorage for demo purposes
 				localStorage.setItem('patientID', patientID)
 				localStorage.setItem('patientName', fullName)
+				localStorage.setItem('patientEmail', email)
+				localStorage.setItem('patientPhone', phone)
 				
 				setTimeout(() => {
 					window.location.href = 'patient-dashboard.html'
@@ -197,8 +239,10 @@
 					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
 				
-				// Store doctor name in localStorage for demo purposes
+				// Store doctor details in localStorage for demo purposes
 				localStorage.setItem('doctorName', fullName)
+				localStorage.setItem('doctorEmail', email)
+				localStorage.setItem('doctorPhone', phone)
 				
 				setTimeout(() => {
 					window.location.href = 'doctor-dashboard.html'
