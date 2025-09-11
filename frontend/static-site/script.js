@@ -22,10 +22,10 @@
 
 	// Enhanced patient ID generation with animation
 	function generatePatientID() {
-		const timestamp = Date.now().toString(36)
-		const random = Math.random().toString(36).substr(2, 5)
+		const currentYear = new Date().getFullYear().toString().slice(-2)
+		const randomNum = Math.floor(Math.random() * 9999).toString().padStart(4, '0')
 		const prefix = 'PAT'
-		return `${prefix}${timestamp}${random}`.toUpperCase()
+		return `${prefix}-${currentYear}-${randomNum}`
 	}
 
 	// Password toggle functionality
