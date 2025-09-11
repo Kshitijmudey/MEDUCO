@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Sign Up • MEDUCO</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">MEDUCO</a>
+        <nav class="nav" id="nav" style="display:none"></nav>
+        <button aria-label="Toggle menu" class="nav-toggle responsive-show" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container" style="max-width:480px">
+          <div style="margin-bottom: 16px; text-align: center;">
+            <a href="index.html" style="color: var(--brand); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+              ← Back to Home
+            </a>
+          </div>
+          <h1 class="text-responsive-3xl">Sign Up</h1>
+          <p class="muted text-responsive-base">Choose a role and create your new account.</p>
+          <div class="card">
+            <div class="row" id="roleTabs" style="margin-top:8px">
+              <button class="btn btn-outline text-responsive-base" data-role="patient">Patient</button>
+              <button class="btn btn-outline text-responsive-base" data-role="doctor">Doctor</button>
+            </div>
+            <form class="form" id="signupForm" style="margin-top:12px">
+              <input class="input text-responsive-base" name="fullName" placeholder="Full name" required>
+              <input class="input text-responsive-base" name="email" type="email" placeholder="Email" required>
+              <input class="input text-responsive-base" name="password" type="password" placeholder="Password" required>
+              <input class="input text-responsive-base" name="confirm" type="password" placeholder="Confirm password" required>
+              <input type="hidden" name="role" id="roleInput" value="patient">
+              <button class="btn btn-primary text-responsive-base" id="submitBtn" type="submit">Sign Up</button>
+              <div style="text-align: center; margin-top: 12px;">
+                <span style="color: var(--text-secondary); font-size: 14px;">Already have an account? </span>
+                <a href="login.html" style="color: var(--brand); text-decoration: none; font-size: 14px; font-weight: 600;">Sign in</a>
+              </div>
+              <div class="form-note" id="signupNote" role="status" aria-live="polite"></div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        © <span id="year"></span> MEDUCO
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
