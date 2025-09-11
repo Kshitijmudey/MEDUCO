@@ -36,7 +36,7 @@
 		if (passwordField && iconElement) {
 			if (passwordField.type === 'password') {
 				passwordField.type = 'text'
-				iconElement.textContent = '🙈'
+				iconElement.textContent = '🙉'
 				iconElement.setAttribute('aria-label', 'Hide password')
 			} else {
 				passwordField.type = 'password'
