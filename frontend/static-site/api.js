@@ -140,6 +140,13 @@ class MeducoAPI {
         return await this.request('/doctors/patients');
     }
 
+    async createPatient(patientData) {
+        return await this.request('/doctors/patients', {
+            method: 'POST',
+            body: JSON.stringify(patientData)
+        });
+    }
+
     // Appointment methods
     async getAppointments(filters = {}) {
         const queryParams = new URLSearchParams(filters);

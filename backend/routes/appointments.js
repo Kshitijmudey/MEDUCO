@@ -65,17 +65,36 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Create new appointment (patients only)
-router.post('/', validateAppointment, getPatientInfo, async (req, res) => {
+// Create new appointment (patients and doctors)
+router.post('/', validateAppointment, async (req, res) => {
     try {
-        if (req.user.role !== 'patient') {
+        let patientId, doctorId;
+
+        if (req.user.role === 'patient') {
+            // Patient requesting appointment
+            const { doctorId: reqDoctorId, appointmentDate, appointmentTime, type, reason } = req.body;
+            patientId = req.patient.id;
+            doctorId = reqDoctorId;
+        } else if (req.user.role === 'doctor') {
+            // Doctor creating appointment for a patient
+            const { patientId: reqPatientId, appointmentDate, appointmentTime, type, reason } = req.body;
+            patientId = reqPatientId;
+            doctorId = req.doctor.id;
+
+            // Validate that patient exists
+            const patient = await database.get('SELECT id FROM patients WHERE id = ?', [patientId]);
+            if (!patient) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Patient not found'
+                });
+            }
+        } else {
             return res.status(403).json({
                 success: false,
-                message: 'Only patients can request appointments'
+                message: 'Unauthorized to create appointments'
             });
         }
-
-        const { doctorId, appointmentDate, appointmentTime, type, reason } = req.body;
 
         // Check if doctor exists
         const doctor = await database.get('SELECT id FROM doctors WHERE id = ?', [doctorId]);
@@ -88,8 +107,8 @@ router.post('/', validateAppointment, getPatientInfo, async (req, res) => {
 
         // Check for scheduling conflicts
         const conflictingAppointment = await database.get(`
-            SELECT id FROM appointments 
-            WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ? 
+            SELECT id FROM appointments
+            WHERE doctor_id = ? AND appointment_date = ? AND appointment_time = ?
             AND status NOT IN ('cancelled', 'no-show')
         `, [doctorId, appointmentDate, appointmentTime]);
 
@@ -102,12 +121,12 @@ router.post('/', validateAppointment, getPatientInfo, async (req, res) => {
 
         const result = await database.run(`
             INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, type, reason, status)
-            VALUES (?, ?, ?, ?, ?, ?, 'pending')
-        `, [req.patient.id, doctorId, appointmentDate, appointmentTime, type, reason]);
+            VALUES (?, ?, ?, ?, ?, ?, 'confirmed')
+        `, [patientId, doctorId, appointmentDate, appointmentTime, type, reason]);
 
         res.status(201).json({
             success: true,
-            message: 'Appointment requested successfully',
+            message: 'Appointment created successfully',
             data: { appointmentId: result.id }
         });
 

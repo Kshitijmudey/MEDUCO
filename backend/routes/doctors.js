@@ -1,13 +1,84 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const database = require('../config/database');
 const { authenticateToken, requireDoctor, getDoctorInfo } = require('../middleware/auth');
+const { v4: uuidv4 } = require('uuid');
 
 const router = express.Router();
+
+// Generate Patient ID
+const generatePatientID = () => {
+    const currentYear = new Date().getFullYear().toString().slice(-2);
+    const randomNum = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+    return `PAT-${currentYear}-${randomNum}`;
+};
 
 // Apply authentication middleware to all routes
 router.use(authenticateToken);
 router.use(requireDoctor);
 router.use(getDoctorInfo);
+
+// Add POST /patients route for doctors to create patients
+router.post('/patients', async (req, res) => {
+    try {
+        const doctorId = req.doctor.id;
+        const { email, firstName, lastName, phone, dateOfBirth, gender, address } = req.body;
+
+        if (!email || !firstName || !lastName) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email, firstName, and lastName are required'
+            });
+        }
+
+        // Check if user with email already exists
+        const existingUser = await database.get('SELECT id FROM users WHERE email = ?', [email]);
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Create user with default password and role 'patient'
+        const defaultPassword = 'defaultPassword123'; // Consider generating a secure random password or sending invite email
+        const saltRounds = 12;
+        const passwordHash = await bcrypt.hash(defaultPassword, saltRounds);
+
+        const userResult = await database.run(
+            'INSERT INTO users (email, password_hash, role, is_active, email_verified) VALUES (?, ?, ?, 1, 1)',
+            [email, passwordHash, 'patient']
+        );
+
+        const userId = userResult.id;
+
+        // Generate patient ID
+        const patientId = generatePatientID();
+
+        // Create patient profile
+        const patientResult = await database.run(
+            `INSERT INTO patients (user_id, patient_id, first_name, last_name, phone, date_of_birth, gender, address)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [userId, patientId, firstName, lastName, phone || null, dateOfBirth || null, gender || null, address || null]
+        );
+
+        res.status(201).json({
+            success: true,
+            message: 'Patient created successfully',
+            data: {
+                patientId,
+                userId,
+                patientProfileId: patientResult.id
+            }
+        });
+    } catch (error) {
+        console.error('Create patient error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create patient'
+        });
+    }
+});
 
 // Get doctor dashboard data
 router.get('/dashboard', async (req, res) => {
@@ -16,7 +87,7 @@ router.get('/dashboard', async (req, res) => {
 
         // Get today's appointments
         const todayAppointments = await database.all(`
-            SELECT 
+            SELECT
                 a.id, a.appointment_time, a.type, a.reason, a.status,
                 p.first_name, p.last_name, p.patient_id
             FROM appointments a
@@ -41,7 +112,7 @@ router.get('/dashboard', async (req, res) => {
 
         // Get recent messages
         const recentMessages = await database.all(`
-            SELECT 
+            SELECT
                 m.id, m.subject, m.message, m.is_urgent, m.is_read, m.created_at,
                 u.email, p.first_name, p.last_name
             FROM messages m
@@ -88,31 +159,119 @@ router.get('/profile', async (req, res) => {
     }
 });
 
-// Get doctor's patients
+// Get doctor's patients with optional search
 router.get('/patients', async (req, res) => {
     try {
-        const patients = await database.all(`
+        const searchTermRaw = req.query.search ? req.query.search.trim() : null;
+        const doctorId = req.doctor.id;
+
+        let query = `
             SELECT DISTINCT
-                p.id, p.patient_id, p.first_name, p.last_name, p.phone, 
+                p.id, p.patient_id, p.first_name, p.last_name, p.phone,
                 p.date_of_birth, p.gender, p.blood_type,
                 MAX(a.appointment_date) as last_appointment
             FROM patients p
             JOIN appointments a ON p.id = a.patient_id
             WHERE a.doctor_id = ?
+        `;
+        const params = [doctorId];
+
+        if (searchTermRaw) {
+            const searchTermLower = searchTermRaw.toLowerCase();
+
+            // Check if searchTermRaw looks like a patient ID (assuming patient IDs start with 'PAT' or similar)
+            const isPatientId = /^PAT/i.test(searchTermRaw);
+
+            if (isPatientId) {
+                // Exact match on patient_id (case insensitive)
+                query += ` AND LOWER(p.patient_id) = ?`;
+                params.push(searchTermLower);
+            } else if (searchTermRaw.includes(' ')) {
+                // Treat as full name: split into first and last name
+                const nameParts = searchTermRaw.split(' ').filter(Boolean);
+                if (nameParts.length >= 2) {
+                    const firstName = nameParts[0].toLowerCase();
+                    const lastName = nameParts.slice(1).join(' ').toLowerCase();
+                    query += ` AND LOWER(p.first_name) = ? AND LOWER(p.last_name) = ?`;
+                    params.push(firstName, lastName);
+                } else {
+                    // If only one part after split, fallback to partial match on first or last name
+                    query += ` AND (LOWER(p.first_name) = ? OR LOWER(p.last_name) = ?)`;
+                    params.push(searchTermLower, searchTermLower);
+                }
+            } else {
+                // Single name search: exact match on first_name or last_name
+                query += ` AND (LOWER(p.first_name) = ? OR LOWER(p.last_name) = ?)`;
+                params.push(searchTermLower, searchTermLower);
+            }
+        }
+
+        query += `
             GROUP BY p.id
             ORDER BY p.last_name, p.first_name
-        `, [req.doctor.id]);
+        `;
+
+        const patients = await database.all(query, params);
 
         res.json({
             success: true,
             data: { patients }
         });
-
     } catch (error) {
         console.error('Get doctor patients error:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to get patients'
+        });
+    }
+});
+
+// Get specific patient details for doctor
+router.get('/patients/:patientId', async (req, res) => {
+    try {
+        const { patientId } = req.params;
+        const doctorId = req.doctor.id;
+
+        // First check if the doctor has access to this patient (has had appointments)
+        const accessCheck = await database.get(`
+            SELECT COUNT(*) as count
+            FROM appointments
+            WHERE doctor_id = ? AND patient_id = (SELECT id FROM patients WHERE patient_id = ?)
+        `, [doctorId, patientId]);
+
+        if (accessCheck.count === 0) {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied: Patient not associated with this doctor'
+            });
+        }
+
+        // Get patient details
+        const patient = await database.get(`
+            SELECT 
+                p.id, p.patient_id, p.first_name, p.last_name, p.email, p.phone,
+                p.date_of_birth, p.gender, p.address, p.blood_type, p.allergies, p.medical_history,
+                p.created_at, p.updated_at
+            FROM patients p
+            WHERE p.patient_id = ?
+        `, [patientId]);
+
+        if (!patient) {
+            return res.status(404).json({
+                success: false,
+                message: 'Patient not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: { patient }
+        });
+    } catch (error) {
+        console.error('Get doctor patient details error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get patient details'
         });
     }
 });
