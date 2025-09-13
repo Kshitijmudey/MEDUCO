@@ -1,0 +1,40 @@
+<!-- New Appointment Modal - Step 1: Patient Lookup -->
+<div id="newAppointmentModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" id="closeNewAppointmentModal">&times;</span>
+    <h2>New Appointment</h2>
+    <div id="patientLookupStep">
+      <label for="patientLookup">Enter Patient Name or ID:</label>
+      <input type="text" id="patientLookup" name="patientLookup" placeholder="Patient name or ID" required>
+      <button type="button" class="btn btn-primary" id="btnLookupPatient">Lookup Patient</button>
+      <div id="patientLookupResult" style="margin-top: 16px;"></div>
+    </div>
+    <div id="appointmentDetailsStep" style="display: none;">
+      <h3 id="appointmentStepTitle">Schedule Appointment</h3>
+      <form id="newAppointmentForm">
+        <input type="hidden" id="selectedPatientId" name="patientId">
+        
+        <label for="appointmentDate">Date:</label>
+        <input type="date" id="appointmentDate" name="appointmentDate" required>
+
+        <label for="appointmentTime">Time:</label>
+        <input type="time" id="appointmentTime" name="appointmentTime" required>
+
+        <label for="appointmentType">Type:</label>
+        <select id="appointmentType" name="appointmentType" required>
+          <option value="">Select type</option>
+          <option value="normal">Normal</option>
+          <option value="emergency">Emergency</option>
+          <option value="follow-up">Follow-up</option>
+          <option value="consultation">Consultation</option>
+        </select>
+
+        <label for="reason">Reason:</label>
+        <textarea id="reason" name="reason" rows="3" required></textarea>
+
+        <button type="submit" class="btn btn-primary">Create Appointment</button>
+        <button type="button" class="btn btn-outline" id="btnBackToLookup">Back</button>
+      </form>
+    </div>
+  </div>
+</div>

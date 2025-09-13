@@ -180,12 +180,40 @@
 				return
 			}
 			
+			// Validate password strength
+			const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
+			if (!passwordRegex.test(password)) {
+				if (signupNote) {
+					signupNote.innerHTML = `
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Password must contain at least one uppercase letter, one lowercase letter, and one number!</p>
+						</div>
+					`
+					signupNote.style.animation = 'fadeInUp 0.6s ease'
+				}
+				return
+			}
+
 			// Validate password confirmation
 			if (password !== confirm) {
 				if (signupNote) {
 					signupNote.innerHTML = `
 						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
 							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Passwords do not match!</p>
+						</div>
+					`
+					signupNote.style.animation = 'fadeInUp 0.6s ease'
+				}
+				return
+			}
+			
+			// Validate email format
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+			if (!emailRegex.test(email)) {
+				if (signupNote) {
+					signupNote.innerHTML = `
+						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Please enter a valid email address!</p>
 						</div>
 					`
 					signupNote.style.animation = 'fadeInUp 0.6s ease'
@@ -251,14 +279,22 @@
 			} catch (error) {
 				console.error('Registration failed:', error)
 				if (signupNote) {
+					let errorMessage = error.message || 'Registration failed. Please try again.'
+
+					// Display detailed validation errors if available
+					if (error.response && error.response.data && error.response.data.errors && Array.isArray(error.response.data.errors)) {
+						const errorList = error.response.data.errors.map(err => `<li>${err.msg}</li>`).join('')
+						errorMessage = `<div>❌ Validation failed:</div><ul style="text-align: left; margin: 8px 0 0 20px;">${errorList}</ul>`
+					}
+
 					signupNote.innerHTML = `
 						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
-							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ ${error.message || 'Registration failed. Please try again.'}</p>
+							<p style="margin: 0; color: #dc2626; font-weight: 600;">${errorMessage}</p>
 						</div>
 					`
 					signupNote.style.animation = 'fadeInUp 0.6s ease'
 				}
-			} finally {
+			}
 				// Reset button state
 				if (submitBtn) {
 					submitBtn.textContent = 'Sign Up'
@@ -977,4 +1013,256 @@ document.addEventListener('DOMContentLoaded', function() {
 			})
 		}, 1000)
 	})
-})() 
+
+	// Appointments page specific functionality
+	if (document.getElementById('appointmentsTableBody')) {
+		// Load appointments when page loads
+		document.addEventListener('DOMContentLoaded', loadAppointments)
+
+		// Event listeners for appointments page
+		const btnNewAppointment = document.getElementById('btnNewAppointment')
+		const btnExportAppointments = document.getElementById('btnExportAppointments')
+		const newAppointmentModal = document.getElementById('newAppointmentModal')
+		const viewAppointmentModal = document.getElementById('viewAppointmentModal')
+		const closeNewAppointmentModal = document.getElementById('closeNewAppointmentModal')
+		const closeViewAppointmentModal = document.getElementById('closeViewAppointmentModal')
+		const newAppointmentForm = document.getElementById('newAppointmentForm')
+		const btnApproveAppointment = document.getElementById('btnApproveAppointment')
+		const btnMarkDoneAppointment = document.getElementById('btnMarkDoneAppointment')
+
+		if (btnNewAppointment) {
+			btnNewAppointment.addEventListener('click', () => {
+				newAppointmentModal.style.display = 'block'
+			})
+		}
+
+		if (btnExportAppointments) {
+			btnExportAppointments.addEventListener('click', exportAppointments)
+		}
+
+		if (closeNewAppointmentModal) {
+			closeNewAppointmentModal.addEventListener('click', () => {
+				newAppointmentModal.style.display = 'none'
+			})
+		}
+
+		if (closeViewAppointmentModal) {
+			closeViewAppointmentModal.addEventListener('click', () => {
+				viewAppointmentModal.style.display = 'none'
+			})
+		}
+
+		if (newAppointmentForm) {
+			newAppointmentForm.addEventListener('submit', createNewAppointment)
+		}
+
+		if (btnApproveAppointment) {
+			btnApproveAppointment.addEventListener('click', () => approveAppointment(currentAppointmentId))
+		}
+
+		if (btnMarkDoneAppointment) {
+			btnMarkDoneAppointment.addEventListener('click', () => markAppointmentDone(currentAppointmentId))
+		}
+
+		// Close modals when clicking outside
+		window.addEventListener('click', (event) => {
+			if (event.target === newAppointmentModal) {
+				newAppointmentModal.style.display = 'none'
+			}
+			if (event.target === viewAppointmentModal) {
+				viewAppointmentModal.style.display = 'none'
+			}
+		})
+
+		let currentAppointmentId = null
+
+		async function loadAppointments() {
+			try {
+				const today = new Date().toISOString().split('T')[0]
+				const response = await window.meducoAPI.getAppointments({ date: today })
+				
+				if (response.success) {
+					populateAppointmentsTable(response.data.appointments)
+				} else {
+					console.error('Failed to load appointments:', response.message)
+				}
+			} catch (error) {
+				console.error('Error loading appointments:', error)
+			}
+		}
+
+		function populateAppointmentsTable(appointments) {
+			const tableBody = document.getElementById('appointmentsTableBody')
+			tableBody.innerHTML = ''
+
+			if (!appointments || appointments.length === 0) {
+				tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No appointments found</td></tr>'
+				return
+			}
+
+			appointments.forEach(appointment => {
+				const row = document.createElement('tr')
+				row.innerHTML = `
+					<td>${appointment.appointment_time}</td>
+					<td>${appointment.patient_first_name} ${appointment.patient_last_name}</td>
+					<td>${appointment.patient_id}</td>
+					<td>${appointment.type}</td>
+					<td><span class="badge ${getStatusClass(appointment.status)}">${appointment.status}</span></td>
+					<td>
+						<button class="btn btn-outline view-btn" style="padding: 4px 8px; font-size: 12px;" data-id="${appointment.id}">View</button>
+					</td>
+				`
+				tableBody.appendChild(row)
+			})
+
+			// Add event listeners to view buttons
+			document.querySelectorAll('.view-btn').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					const appointmentId = e.target.getAttribute('data-id')
+					viewAppointment(appointmentId)
+				})
+			})
+		}
+
+		function getStatusClass(status) {
+			switch (status.toLowerCase()) {
+				case 'confirmed': return ''
+				case 'pending': return 'warning'
+				case 'cancelled': return 'alert'
+				case 'completed': return 'success'
+				default: return ''
+			}
+		}
+
+		async function viewAppointment(appointmentId) {
+			try {
+				// Get appointment details (assuming we can get by ID, or filter from loaded appointments)
+				const today = new Date().toISOString().split('T')[0]
+				const response = await window.meducoAPI.getAppointments({ date: today })
+				
+				if (response.success) {
+					const appointment = response.data.appointments.find(app => app.id == appointmentId)
+					if (appointment) {
+						currentAppointmentId = appointmentId
+						const detailsDiv = document.getElementById('appointmentDetails')
+						detailsDiv.innerHTML = `
+							<p><strong>Patient:</strong> ${appointment.patient_first_name} ${appointment.patient_last_name}</p>
+							<p><strong>Patient ID:</strong> ${appointment.patient_id}</p>
+							<p><strong>Date:</strong> ${appointment.appointment_date}</p>
+							<p><strong>Time:</strong> ${appointment.appointment_time}</p>
+							<p><strong>Type:</strong> ${appointment.type}</p>
+							<p><strong>Reason:</strong> ${appointment.reason || 'N/A'}</p>
+							<p><strong>Status:</strong> ${appointment.status}</p>
+							${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ''}
+							${appointment.diagnosis ? `<p><strong>Diagnosis:</strong> ${appointment.diagnosis}</p>` : ''}
+							${appointment.prescription ? `<p><strong>Prescription:</strong> ${appointment.prescription}</p>` : ''}
+						`
+						viewAppointmentModal.style.display = 'block'
+					}
+				}
+			} catch (error) {
+				console.error('Error viewing appointment:', error)
+			}
+		}
+
+		async function createNewAppointment(event) {
+			event.preventDefault()
+			
+			const formData = new FormData(event.target)
+			const appointmentData = {
+				patientId: formData.get('patientId'),
+				appointmentDate: formData.get('appointmentDate'),
+				appointmentTime: formData.get('appointmentTime'),
+				type: formData.get('appointmentType'),
+				reason: formData.get('reason')
+			}
+
+			try {
+				const response = await window.meducoAPI.createAppointment(appointmentData)
+				
+				if (response.success) {
+					alert('Appointment created successfully!')
+					newAppointmentModal.style.display = 'none'
+					event.target.reset()
+					loadAppointments() // Reload appointments
+				} else {
+					alert('Failed to create appointment: ' + response.message)
+				}
+			} catch (error) {
+				console.error('Error creating appointment:', error)
+				alert('Error creating appointment: ' + error.message)
+			}
+		}
+
+		async function approveAppointment(appointmentId) {
+			try {
+				const response = await window.meducoAPI.updateAppointment(appointmentId, { status: 'confirmed' })
+				
+				if (response.success) {
+					alert('Appointment approved!')
+					viewAppointmentModal.style.display = 'none'
+					loadAppointments() // Reload appointments
+				} else {
+					alert('Failed to approve appointment: ' + response.message)
+				}
+			} catch (error) {
+				console.error('Error approving appointment:', error)
+				alert('Error approving appointment: ' + error.message)
+			}
+		}
+
+		async function markAppointmentDone(appointmentId) {
+			try {
+				const response = await window.meducoAPI.updateAppointment(appointmentId, { status: 'completed' })
+				
+				if (response.success) {
+					alert('Appointment marked as done!')
+					viewAppointmentModal.style.display = 'none'
+					loadAppointments() // Reload appointments
+				} else {
+					alert('Failed to mark appointment as done: ' + response.message)
+				}
+			} catch (error) {
+				console.error('Error marking appointment as done:', error)
+				alert('Error marking appointment as done: ' + error.message)
+			}
+		}
+
+		async function exportAppointments() {
+			try {
+				const today = new Date()
+				const tomorrow = new Date(today)
+				tomorrow.setDate(tomorrow.getDate() + 1)
+				const tomorrowStr = tomorrow.toISOString().split('T')[0]
+				
+				// Get today's appointments
+				const response = await window.meducoAPI.getAppointments({ date: new Date().toISOString().split('T')[0] })
+				
+				if (response.success && response.data && response.data.appointments && response.data.appointments.length > 0) {
+					// Create new appointments for tomorrow
+					const exportPromises = response.data.appointments.map(async (appointment) => {
+						const newAppointmentData = {
+							patientId: appointment.patient_id,
+							appointmentDate: tomorrowStr,
+							appointmentTime: appointment.appointment_time,
+							type: appointment.type,
+							reason: `Exported from ${appointment.appointment_date} - ${appointment.reason || ''}`
+						}
+						return window.meducoAPI.createAppointment(newAppointmentData)
+					})
+					
+					const results = await Promise.all(exportPromises)
+					const successCount = results.filter(r => r.success).length
+					
+					alert(`Exported ${successCount} appointments to ${tomorrow.toLocaleDateString()}`)
+					loadAppointments() // Reload to show any changes
+				} else {
+					alert('No appointments to export')
+				}
+			} catch (error) {
+				console.error('Error exporting appointments:', error)
+				alert('Error exporting appointments: ' + error.message)
+			}
+		}
+	}
+})()

@@ -1,6 +1,6 @@
 # MEDUCO Healthcare Management Platform
 
-A comprehensive healthcare management system with a static frontend and Node.js/Express backend with SQLite database.
+A comprehensive healthcare management system with a static frontend and Node.js/Express backend supporting both SQLite and PostgreSQL databases.
 
 ## 🏥 Features
 
@@ -25,13 +25,35 @@ A comprehensive healthcare management system with a static frontend and Node.js/
    npm install
    ```
 
-3. **Set up the database**:
+3. **Configure environment**:
    ```bash
-   npm run setup-db
-   npm run seed-db
+   cp .env.example .env
+   # Edit .env file with your database and API credentials
    ```
 
-4. **Start the backend server**:
+4. **Database Setup (Choose one)**:
+
+   **Option A: SQLite (Default)**
+   ```bash
+   npm run setup-db
+   npm run init-db
+   ```
+
+   **Option B: PostgreSQL**
+   ```bash
+   # Set DATABASE_TYPE=postgresql in .env
+   # Install PostgreSQL and create database
+   createdb meduco
+   
+   # Setup tables and initialize empty database
+   npm run setup-db-postgres
+   npm run init-db-postgres
+   
+   # Optional: Migrate existing SQLite data to PostgreSQL
+   npm run migrate-to-postgres
+   ```
+
+5. **Start the backend server**:
    ```bash
    npm run dev
    ```
@@ -81,16 +103,23 @@ A comprehensive healthcare management system with a static frontend and Node.js/
 /workspace/
 ├── backend/                 # Node.js/Express backend
 │   ├── config/             # Database configuration
+│   │   ├── database.js    # SQLite configuration
+│   │   └── database-postgres.js # PostgreSQL configuration
 │   ├── controllers/        # API controllers (placeholder)
 │   ├── database/           # Database files and scripts
 │   │   ├── meduco.db      # SQLite database
-│   │   ├── setup.js       # Database schema creation
-│   │   └── seed.js        # Sample data insertion
+│   │   ├── setup.js       # SQLite schema creation
+│   │   ├── setup-postgres.js # PostgreSQL schema creation
+│   │   ├── seed.js        # SQLite database initialization (empty)
+│   │   ├── seed-postgres.js # PostgreSQL database initialization (empty)
+│   │   └── migrate-to-postgres.js # Migration script
 │   ├── middleware/         # Authentication and validation
 │   ├── models/            # Database models (placeholder)
 │   ├── routes/            # API route handlers
+│   ├── services/          # AI and communication services
 │   ├── utils/             # Utility functions (placeholder)
 │   ├── .env               # Environment configuration
+│   ├── .env.example       # Environment template
 │   ├── package.json       # Node.js dependencies
 │   └── server.js          # Main server file
 ├── frontend/
@@ -142,8 +171,11 @@ A comprehensive healthcare management system with a static frontend and Node.js/
 
 ## 🗄️ Database Schema
 
-The SQLite database includes the following main tables:
+## 🗄️ Database Support
 
+The system supports both **SQLite** (default) and **PostgreSQL** databases with identical schemas:
+
+### Core Tables
 - **users** - User authentication and roles
 - **patients** - Patient profiles and information
 - **doctors** - Doctor profiles and specializations
@@ -153,6 +185,14 @@ The SQLite database includes the following main tables:
 - **care_plans** - Treatment plans and progress tracking
 - **medications** - Prescribed medications and adherence
 - **notifications** - System notifications and alerts
+- **communication_logs** - SMS/Email delivery tracking
+
+### Database Features
+- **Foreign key constraints** for data integrity
+- **Audit logging** for security compliance
+- **Optimized indexes** for performance
+- **Auto-updating timestamps** (PostgreSQL)
+- **JSON support** for flexible data storage (PostgreSQL)
 
 ## 🔧 Development
 
@@ -165,12 +205,42 @@ npm run dev  # Start with nodemon for auto-restart
 
 ### Database Management
 
+**SQLite Commands:**
 ```bash
-# Recreate database schema
+# Recreate SQLite database schema
 npm run setup-db
 
-# Reseed with sample data
-npm run seed-db
+# Initialize SQLite with empty tables
+npm run init-db
+```
+
+**PostgreSQL Commands:**
+```bash
+# Setup PostgreSQL database schema
+npm run setup-db-postgres
+
+# Initialize PostgreSQL with empty tables
+npm run init-db-postgres
+
+# Migrate data from SQLite to PostgreSQL (if data exists)
+npm run migrate-to-postgres
+```
+
+### Database Switching
+
+To switch between databases, update your `.env` file:
+
+```bash
+# For SQLite (default)
+DATABASE_TYPE=sqlite
+
+# For PostgreSQL
+DATABASE_TYPE=postgresql
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=meduco
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
 ```
 
 ### API Testing
@@ -228,21 +298,66 @@ The frontend is fully responsive and works on:
 ## 🚀 Deployment Ready
 
 The system is production-ready with:
-- Environment configuration
-- Error handling
-- Logging
-- Security middleware
-- Database transactions
-- API documentation
+- **Multi-database support** (SQLite/PostgreSQL)
+- **Clean database initialization** (no sample data)
+- **Environment configuration** with comprehensive templates
+- **Error handling** and graceful shutdowns
+- **Security middleware** (Helmet, CORS, Rate limiting)
+- **Database transactions** and connection pooling
+- **Health monitoring** endpoints
+- **Migration tools** for database transitions
+- **API documentation** with runtime status
+- **Real-time data collection** ready
 
 ## 🤝 Contributing
 
 This is a complete healthcare management system demonstrating:
-- Modern web development practices
-- Secure API development
-- Responsive frontend design
-- Database design and management
-- Real-time data integration
+- **Modern web development practices**
+- **Secure API development** with JWT and role-based access
+- **Responsive frontend design** with real-time updates
+- **Multi-database architecture** (SQLite + PostgreSQL)
+- **AI-powered healthcare features** (OpenAI integration)
+- **Production-ready deployment** with monitoring
+- **Healthcare compliance** considerations
+
+### Prerequisites for Development
+
+1. **Node.js** (v16 or higher)
+2. **PostgreSQL** (v12 or higher) - if using PostgreSQL
+3. **Git** for version control
+
+### Optional Services
+- **OpenAI API** for AI-powered messaging
+- **Twilio** for SMS notifications
+- **SMTP Server** for email notifications
+
+### Getting Started
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd "ai based patient care management system"
+
+# Install dependencies
+cd backend && npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# Setup database (choose one)
+npm run setup-db-postgres  # PostgreSQL
+# or
+npm run setup-db          # SQLite
+
+# Initialize with empty tables
+npm run init-db-postgres   # PostgreSQL
+# or
+npm run init-db           # SQLite
+
+# Start development server
+npm run dev
+```
 
 ## 📄 License
 

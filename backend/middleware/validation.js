@@ -60,6 +60,7 @@ const validateLogin = [
 // Appointment validation
 const validateAppointment = [
     body('doctorId')
+        .optional()
         .isInt({ min: 1 })
         .withMessage('Valid doctor ID is required'),
     body('appointmentDate')

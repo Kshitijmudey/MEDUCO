@@ -1,20 +1,25 @@
-# TODO: Enhance Appointment Section in Doctor's Dashboard
+# TODO List for AI Agent and Notification Implementation
 
-## Pending Tasks
-- [x] Add POST /patients route in backend/routes/doctors.js for doctors to create patients
-- [x] Modify POST /appointments in backend/routes/appointments.js to allow doctors to create appointments
-- [ ] Test the integration to ensure no other functionality is affected
-- [ ] Verify that all requested features work: new appointment creation, patient lookup/creation, export appointments, view/approve/mark done, real-time data loading
+## 1. Add Appointment Approval Notification
+- [x] Add `sendAppointmentApprovalNotification` method in `backend/services/reminderService.js`
+- [x] Modify `backend/routes/appointments.js` PUT /:id route to call the notification method when status changes to 'confirmed'
+- [x] Ensure notification includes appointment details (date, time, doctor, etc.)
+- [x] Send via SMS, email, and create in-app notification
 
-## Information Gathered
-- Frontend API (api.js) already has createPatient method implemented
-- Backend doctors.js currently has only GET routes
-- Backend appointments.js POST route currently only allows patients to create appointments
-- Patient creation requires both user and patient records in database
-- Doctor appointment creation needs to allow specifying patient_id
+## 2. Verify Signup Messages
+- [x] Confirm that `backend/routes/auth.js` sends welcome messages to both doctors and patients after signup
+- [x] Test that messages are sent via SMS and email using existing `reminderService.sendWelcomeMessage`
 
-## Plan
-1. **Add POST /patients in doctors.js**: Create a route that allows doctors to create new patients by creating a user account with role='patient' and a default password, then creating the patient profile.
-2. **Modify POST /appointments in appointments.js**: Update the route to allow doctors to create appointments for patients by providing patient_id and using the doctor's own id.
-3. **Test Integration**: Verify that the frontend can successfully create patients and appointments through the new backend routes.
-4. **Verify Features**: Ensure all appointment management features work as expected without breaking existing functionality.
+## 3. Test AI Agent Reminders
+- [x] Verify that medication reminders are sent daily at 8 AM
+- [x] Verify that care plan follow-up reminders are sent according to frequency
+- [x] Confirm AI-generated personalized messages are used
+
+## 4. Integration Testing
+- [ ] Test end-to-end signup message sending
+- [ ] Test appointment approval notification sending
+- [ ] Verify SMS and email delivery (check communication logs)
+- [ ] Check in-app notifications are created
+
+## 5. Documentation
+- [ ] Update any relevant documentation if needed

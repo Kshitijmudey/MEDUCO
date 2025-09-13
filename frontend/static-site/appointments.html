@@ -35,8 +35,30 @@
           <h1>Appointments</h1>
           <p class="muted">Manage schedules, reminders, and follow‑ups.</p>
           <div class="card row">
-            <button class="btn btn-primary">New Appointment</button>
-            <button class="btn btn-outline">Export</button>
+            <button class="btn btn-primary" id="btnNewAppointment">New Appointment</button>
+            <button class="btn btn-outline" id="btnExportAppointments">Export</button>
+          </div>
+
+          <div class="card" style="margin-top: 24px;">
+            <h3 style="margin-top: 0;">Pending Appointments for Approval</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient Name</th>
+                    <th>Patient ID</th>
+                    <th>Type</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingAppointmentsTableBody">
+                  <!-- Pending appointments will be dynamically loaded here -->
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div class="card" style="margin-top: 24px;">
@@ -53,59 +75,31 @@
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td>09:00 AM</td>
-                    <td>Jane Cooper</td>
-                    <td>PAT123456</td>
-                    <td>Follow-up Consultation</td>
-                    <td><span class="badge">Confirmed</span></td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>10:30 AM</td>
-                    <td>Wade Warren</td>
-                    <td>PAT789012</td>
-                    <td>Initial Consultation</td>
-                    <td><span class="badge">Confirmed</span></td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>02:00 PM</td>
-                    <td>Esther Howard</td>
-                    <td>PAT345678</td>
-                    <td>Lab Results Review</td>
-                    <td><span class="badge">Confirmed</span></td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>03:30 PM</td>
-                    <td>Robert Johnson</td>
-                    <td>PAT901234</td>
-                    <td>Medication Review</td>
-                    <td><span class="badge">Pending</span></td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>04:45 PM</td>
-                    <td>Sarah Wilson</td>
-                    <td>PAT567890</td>
-                    <td>Annual Check-up</td>
-                    <td><span class="badge">Confirmed</span></td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
+                <tbody id="appointmentsTableBody">
+                  <!-- Appointments will be dynamically loaded here -->
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- New Appointment Modal -->
+          <!-- Include new appointment modal from separate file -->
+          <div id="newAppointmentModalContainer"></div>
+
+          <!-- Export Appointment Modal -->
+          <!-- Include export appointment modal from separate file -->
+          <div id="exportAppointmentModalContainer"></div>
+
+          <!-- View Appointment Modal -->
+          <div id="viewAppointmentModal" class="modal" style="display:none;">
+            <div class="modal-content">
+              <span class="close" id="closeViewAppointmentModal">&times;</span>
+              <h2>Appointment Details</h2>
+              <div id="appointmentDetails"></div>
+              <div style="margin-top: 16px;">
+                <button id="btnApproveAppointment" class="btn btn-primary">Approve</button>
+                <button id="btnMarkDoneAppointment" class="btn btn-success">Mark as Done</button>
+              </div>
             </div>
           </div>
 
@@ -152,6 +146,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="enhanced-appointments-script.js"></script>
     <script>
       // Display current date
       function displayCurrentDate() {

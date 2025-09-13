@@ -38,28 +38,31 @@
             <div class="overview-card">
               <div class="overview-icon">👥</div>
               <div class="overview-content">
-                <div class="overview-value text-responsive-2xl">124</div>
+            <div class="overview-card">
+              <div class="overview-icon">👥</div>
+              <div class="overview-content">
+                <div class="overview-value text-responsive-2xl"></div>
                 <div class="overview-label text-responsive-base">Total Patients</div>
               </div>
             </div>
             <div class="overview-card">
               <div class="overview-icon">📅</div>
               <div class="overview-content">
-                <div class="overview-value text-responsive-2xl">9</div>
+                <div class="overview-value text-responsive-2xl"></div>
                 <div class="overview-label text-responsive-base">Today's Appointments</div>
               </div>
             </div>
             <div class="overview-card">
               <div class="overview-icon">🔴</div>
               <div class="overview-content">
-                <div class="overview-value text-responsive-2xl">3</div>
+                <div class="overview-value text-responsive-2xl"></div>
                 <div class="overview-label text-responsive-base">Urgent Alerts</div>
               </div>
             </div>
             <div class="overview-card">
               <div class="overview-icon">📊</div>
               <div class="overview-content">
-                <div class="overview-value text-responsive-2xl">85%</div>
+                <div class="overview-value text-responsive-2xl"></div>
                 <div class="overview-label text-responsive-base">Patient Satisfaction</div>
               </div>
             </div>
@@ -85,62 +88,24 @@
           <div class="grid-3" style="margin-bottom: 24px;">
             <div class="card">
               <h3 style="margin-top: 0;" class="text-responsive-xl">Top Conditions</h3>
-              <div class="stat-item">
-                <span>Diabetes</span>
-                <span class="stat-value">32%</span>
-              </div>
-              <div class="stat-item">
-                <span>Hypertension</span>
-                <span class="stat-value">28%</span>
-              </div>
-              <div class="stat-item">
-                <span>Cardiovascular</span>
-                <span class="stat-value">18%</span>
-              </div>
-              <div class="stat-item">
-                <span>Respiratory</span>
-                <span class="stat-value">12%</span>
-              </div>
-              <div class="stat-item">
-                <span>Other</span>
-                <span class="stat-value">10%</span>
-              </div>
+              <!-- Removed hardcoded sample data - will be populated from backend -->
             </div>
             <div class="card">
               <h3 style="margin-top: 0;" class="text-responsive-xl">Recent Lab Results</h3>
-              <div class="stat-item">
-                <span>Normal</span>
-                <span class="stat-value normal">67%</span>
-              </div>
-              <div class="stat-item">
-                <span>Borderline</span>
-                <span class="stat-value warning">23%</span>
-              </div>
-              <div class="stat-item">
-                <span>Abnormal</span>
-                <span class="stat-value alert">10%</span>
-              </div>
+              <!-- Removed hardcoded sample data - will be populated from backend -->
             </div>
             <div class="card">
               <h3 style="margin-top: 0;" class="text-responsive-xl">Care Plan Status</h3>
-              <div class="stat-item">
-                <span>Active</span>
-                <span class="stat-value active">45</span>
-              </div>
-              <div class="stat-item">
-                <span>Completed</span>
-                <span class="stat-value completed">28</span>
-              </div>
-              <div class="stat-item">
-                <span>Pending Review</span>
-                <span class="stat-value pending">12</span>
-              </div>
+              <!-- Removed hardcoded sample data - will be populated from backend -->
             </div>
           </div>
 
           <div class="grid-2">
             <div class="card">
               <h3 style="margin-top:0">Today's Appointments</h3>
+              <button class="btn btn-primary" id="btnNewAppointment" style="margin-bottom: 12px;">New Appointment</button>
+              <div id="newAppointmentModalContainer"></div>
+              <div id="exportAppointmentModalContainer"></div>
               <div class="table-wrap">
                 <table>
                   <thead>
@@ -151,16 +116,16 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>09:30</td>
-                      <td>Jane Cooper</td>
-                      <td>HbA1c follow-up</td>
-                    </tr>
-                    <tr>
-                      <td>11:00</td>
-                      <td>Wade Warren</td>
-                      <td>BP check</td>
-                    </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
                   </tbody>
                 </table>
               </div>
@@ -173,6 +138,9 @@
               </ul>
             </div>
           </div>
+
+          <!-- New Appointment Modal -->
+          <div id="newAppointmentModalContainer"></div>
         </div>
       </section>
     </main>
@@ -185,6 +153,7 @@
 
     <script src="api.js"></script>
     <script src="script.js"></script>
+    <script src="enhanced-appointments-script.js"></script>
     <script>
       // Load doctor dashboard data from API
       window.addEventListener('DOMContentLoaded', async function() {
@@ -265,11 +234,11 @@
           }
         }
 
-        // Fallback to localStorage for compatibility
-        const doctorName = localStorage.getItem('doctorName')
-        if (doctorName && document.getElementById('doctorName').textContent === 'Doctor') {
-          document.getElementById('doctorName').textContent = doctorName
-        }
+        // Removed fallback to localStorage for doctorName to use only real-time backend data
+        // const doctorName = localStorage.getItem('doctorName')
+        // if (doctorName && document.getElementById('doctorName').textContent === 'Doctor') {
+        //   document.getElementById('doctorName').textContent = doctorName
+        // }
       })
 
       // Simple chart rendering using Canvas
@@ -277,8 +246,8 @@
         const canvas = document.getElementById('appointmentChart');
         const ctx = canvas.getContext('2d');
         
-        // Chart data
-        const data = [12, 15, 8, 20, 18, 22, 9]; // Monday to Sunday
+        // Chart data - removed hardcoded sample data
+        const data = []; // Will be populated from backend if available
         const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         
         const width = canvas.width;
@@ -314,14 +283,8 @@
         const canvas = document.getElementById('ageChart');
         const ctx = canvas.getContext('2d');
         
-        // Chart data
-        const data = [
-          { label: '18-30', value: 15, color: '#3b82f6' },
-          { label: '31-45', value: 28, color: '#10b981' },
-          { label: '46-60', value: 42, color: '#f59e0b' },
-          { label: '61-75', value: 32, color: '#ef4444' },
-          { label: '75+', value: 7, color: '#8b5cf6' }
-        ];
+        // Chart data - removed hardcoded sample data
+        const data = []; // Will be populated from backend if available
         
         const width = canvas.width;
         const height = canvas.height;
@@ -365,13 +328,93 @@
       document.addEventListener('DOMContentLoaded', function() {
         drawAppointmentChart();
         drawAgeChart();
-        
-        // Display doctor name if it exists
-        const doctorName = localStorage.getItem('doctorName');
-        if (doctorName) {
-          document.getElementById('doctorName').textContent = doctorName;
-        }
+
+        // Removed fallback to localStorage for doctorName to use only real-time backend data
+        // const doctorName = localStorage.getItem('doctorName');
+        // if (doctorName) {
+        //   document.getElementById('doctorName').textContent = doctorName;
+        // }
+
+        // Load new appointment modal
+        loadNewAppointmentModal();
       });
+
+      async function loadNewAppointmentModal() {
+        try {
+          // Instead of fetch, directly insert modal HTML content here to avoid CORS issues
+          const modalHtml = `
+            <div id="newAppointmentModal" class="modal" style="display:none;">
+              <div class="modal-content">
+                <span class="close" id="closeNewAppointmentModal">&times;</span>
+                <h2>New Appointment</h2>
+                <div id="patientLookupStep">
+                  <label for="patientLookup">Enter Patient Name or ID:</label>
+                  <input type="text" id="patientLookup" name="patientLookup" placeholder="Patient name or ID" required>
+                  <button type="button" class="btn btn-primary" id="btnLookupPatient">Lookup Patient</button>
+                  <div id="patientLookupResult" style="margin-top: 16px;"></div>
+                </div>
+                <div id="appointmentDetailsStep" style="display: none;">
+                  <h3 id="appointmentStepTitle">Schedule Appointment</h3>
+                  <form id="newAppointmentForm">
+                    <input type="hidden" id="selectedPatientId" name="patientId">
+                    
+                    <label for="appointmentDate">Date:</label>
+                    <input type="date" id="appointmentDate" name="appointmentDate" required>
+
+                    <label for="appointmentTime">Time:</label>
+                    <input type="time" id="appointmentTime" name="appointmentTime" required>
+
+                    <label for="appointmentType">Type:</label>
+                    <select id="appointmentType" name="appointmentType" required>
+                      <option value="">Select type</option>
+                      <option value="normal">Normal</option>
+                      <option value="emergency">Emergency</option>
+                      <option value="follow-up">Follow-up</option>
+                      <option value="consultation">Consultation</option>
+                    </select>
+
+                    <label for="reason">Reason:</label>
+                    <textarea id="reason" name="reason" rows="3" required></textarea>
+
+                    <button type="submit" class="btn btn-primary">Create Appointment</button>
+                    <button type="button" class="btn btn-outline" id="btnBackToLookup">Back</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          `;
+          document.getElementById('newAppointmentModalContainer').innerHTML = modalHtml;
+
+          // Bind modal events
+          const btnNewAppointment = document.getElementById('btnNewAppointment');
+          const newAppointmentModal = document.getElementById('newAppointmentModal');
+          const closeNewAppointmentModal = document.getElementById('closeNewAppointmentModal');
+
+          if (btnNewAppointment && newAppointmentModal) {
+            btnNewAppointment.addEventListener('click', () => {
+              newAppointmentModal.style.display = 'block';
+              newAppointmentModal.classList.add('show');
+            });
+          }
+
+          if (closeNewAppointmentModal) {
+            closeNewAppointmentModal.addEventListener('click', () => {
+              newAppointmentModal.style.display = 'none';
+              newAppointmentModal.classList.remove('show');
+            });
+          }
+
+          // Close modal when clicking outside
+          window.addEventListener('click', (event) => {
+            if (event.target === newAppointmentModal) {
+              newAppointmentModal.style.display = 'none';
+            }
+          });
+
+        } catch (error) {
+          console.error('Error loading new appointment modal:', error);
+        }
+      }
     </script>
   </body>
 </html> 
