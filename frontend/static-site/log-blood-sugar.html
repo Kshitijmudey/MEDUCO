@@ -91,6 +91,57 @@
       </div>
     </footer>
 
+    <script src="api.js"></script>
     <script src="script.js"></script>
+    <script>
+      // Load blood sugar readings on page load
+      document.addEventListener('DOMContentLoaded', async function() {
+        await loadBloodSugarReadings();
+      });
+
+      async function loadBloodSugarReadings() {
+        try {
+          const response = await window.meducoAPI.getPatientHealthRecords({ type: 'blood_sugar', limit: 10 });
+          const records = response.data.records || [];
+
+          const tbody = document.querySelector('tbody');
+          if (records.length > 0) {
+            tbody.innerHTML = records.map(record => {
+              const date = new Date(record.recorded_at).toLocaleDateString();
+              const time = new Date(record.recorded_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              const reading = record.value;
+              const type = record.metadata?.type || 'General';
+
+              // Color coding based on ranges
+              let color = '#059669'; // green
+              if (reading > 180) color = '#dc2626'; // red
+              else if (reading > 130) color = '#d97706'; // amber
+
+              return `
+                <tr>
+                  <td>${date} ${time}</td>
+                  <td style="color: ${color}; font-weight: 600;">${reading} mg/dL</td>
+                  <td>${type}</td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="3" style="text-align: center; color: var(--text-secondary);">No blood sugar readings found</td>
+              </tr>
+            `;
+          }
+        } catch (error) {
+          console.error('Failed to load blood sugar readings:', error);
+          const tbody = document.querySelector('tbody');
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="3" style="text-align: center; color: var(--text-secondary);">Failed to load readings. Please try again later.</td>
+            </tr>
+          `;
+        }
+      }
+    </script>
   </body>
-</html> 
+</html>

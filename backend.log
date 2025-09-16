@@ -1,0 +1,22 @@
+
+> meduco-backend@1.0.0 dev
+> nodemon server.js
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node server.js`[39m
+[dotenv@17.2.2] injecting env (23) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+OpenAI API key not found. AI features will use fallback messages.
+Connected to PostgreSQL database successfully
+🚀 MEDUCO API Server running on port 3001
+🏥 Environment: development
+📋 API Documentation: http://localhost:3001/api/v1/docs
+💊 Health Check: http://localhost:3001/health
+📊 Database: PostgreSQL (localhost:5432/meduco)
+[0mGET /health [32m200[0m 4.953 ms - 355[0m
+[0mGET /health [32m200[0m 0.898 ms - 355[0m
+
+🛑 Shutting down server...
+PostgreSQL database connection closed

@@ -4,6 +4,20 @@
 	const year = document.getElementById('year')
 	if (year) year.textContent = new Date().getFullYear().toString()
 
+	// Global logout function
+	window.logout = async function() {
+		try {
+			await window.meducoAPI.logout()
+			window.location.href = 'index.html'
+		} catch (error) {
+			console.error('Logout error:', error)
+			// Force logout even if API fails
+			localStorage.removeItem('authToken')
+			localStorage.removeItem('userData')
+			window.location.href = 'index.html'
+		}
+	}
+
 	// Enhanced contact form with animations
 	const form = document.getElementById('contactForm')
 	const note = document.getElementById('formNote')
@@ -52,222 +66,9 @@
 		}
 	}
 
-	// Enhanced role switching with smooth transitions (works for both login and signup)
-	const roleTabs = document.getElementById('roleTabs')
-	const roleInput = document.getElementById('roleInput')
-	const loginForm = document.getElementById('loginForm')
-	const signupForm = document.getElementById('signupForm')
-	const loginNote = document.getElementById('loginNote')
-	const signupNote = document.getElementById('signupNote')
-	const currentForm = loginForm || signupForm
-	
-	if (roleTabs && roleInput) {
-		roleTabs.addEventListener('click', (e) => {
-			const target = e.target
-			if (!(target instanceof HTMLElement)) return
-			const role = target.getAttribute('data-role')
-			if (!role) return
-			
-			roleInput.value = role
-			
-			// Enhanced role switching animations
-			for (const btn of roleTabs.querySelectorAll('[data-role]')) {
-				btn.classList.remove('btn-primary')
-				btn.classList.add('btn-outline')
-				btn.style.transform = 'scale(0.95)'
-			}
-			
-			target.classList.remove('btn-outline')
-			target.classList.add('btn-primary')
-			target.style.transform = 'scale(1.05)'
-			
-			// Add subtle animation to form
-			if (currentForm) {
-				currentForm.style.animation = 'pulse 0.3s ease'
-				setTimeout(() => {
-					currentForm.style.animation = ''
-				}, 300)
-			}
-		})
-	}
 
-	// Enhanced login form submission (sign-in only)
-	if (loginForm) {
-		loginForm.addEventListener('submit', async (e) => {
-			e.preventDefault()
-			const data = new FormData(loginForm)
-			const email = String(data.get('email') || '')
-			const password = String(data.get('password') || '')
-			const role = String(data.get('role') || 'patient')
-			const submitBtn = loginForm.querySelector('#submitBtn')
-			
-			// Enhanced loading state
-			if (submitBtn) {
-				submitBtn.textContent = 'Signing in...'
-				submitBtn.disabled = true
-				submitBtn.style.opacity = '0.7'
-			}
-			
-			try {
-				// Use real API for login
-				const response = await window.meducoAPI.login(email, password, role)
-				
-				if (loginNote) {
-					loginNote.innerHTML = `
-						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #10b981; margin-top: 16px;">
-							<p style="margin: 0; color: #059669; font-weight: 600;">✅ Signed in successfully. Redirecting...</p>
-						</div>
-					`
-					loginNote.style.animation = 'fadeInUp 0.6s ease'
-				}
-				
-				// Store additional data for compatibility
-				if (role === 'patient' && response.user.profile) {
-					localStorage.setItem('patientName', `${response.user.profile.first_name} ${response.user.profile.last_name}`)
-					localStorage.setItem('patientID', response.user.profile.patient_id)
-				} else if (role === 'doctor' && response.user.profile) {
-					localStorage.setItem('doctorName', `${response.user.profile.first_name} ${response.user.profile.last_name}`)
-				}
-				
-				const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
-				setTimeout(() => { window.location.href = dest }, 1500)
-				
-			} catch (error) {
-				console.error('Login failed:', error)
-				if (loginNote) {
-					loginNote.innerHTML = `
-						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
-							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ ${error.message || 'Login failed. Please try again.'}</p>
-						</div>
-					`
-					loginNote.style.animation = 'fadeInUp 0.6s ease'
-				}
-			} finally {
-				// Reset button state
-				if (submitBtn) {
-					submitBtn.textContent = 'Sign In'
-					submitBtn.disabled = false
-					submitBtn.style.opacity = '1'
-				}
-			}
-		})
-	}
 
-	// Enhanced signup form submission
-	if (signupForm) {
-		signupForm.addEventListener('submit', async (e) => {
-			e.preventDefault()
-			const data = new FormData(signupForm)
-			const role = String(data.get('role') || 'patient')
-			const fullName = String(data.get('fullName') || '')
-			const email = String(data.get('email') || '')
-			const phone = String(data.get('phone') || '')
-			const password = String(data.get('password') || '')
-			const confirm = String(data.get('confirm') || '')
-			const submitBtn = signupForm.querySelector('#submitBtn')
-			
-			// Validate phone number format
-			const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
-			if (!phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''))) {
-				if (signupNote) {
-					signupNote.innerHTML = `
-						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
-							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Please enter a valid phone number!</p>
-						</div>
-					`
-					signupNote.style.animation = 'fadeInUp 0.6s ease'
-				}
-				return
-			}
-			
-			// Validate password confirmation
-			if (password !== confirm) {
-				if (signupNote) {
-					signupNote.innerHTML = `
-						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
-							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ Passwords do not match!</p>
-						</div>
-					`
-					signupNote.style.animation = 'fadeInUp 0.6s ease'
-				}
-				return
-			}
-			
-			// Enhanced loading state
-			if (submitBtn) {
-				submitBtn.textContent = 'Creating account...'
-				submitBtn.disabled = true
-				submitBtn.style.opacity = '0.7'
-			}
-			
-			try {
-				// Parse full name
-				const nameParts = fullName.trim().split(' ')
-				const firstName = nameParts[0] || ''
-				const lastName = nameParts.slice(1).join(' ') || ''
-				
-				// Use real API for registration
-				const response = await window.meducoAPI.register({
-					email,
-					password,
-					role,
-					firstName,
-					lastName,
-					phone
-				})
-				
-				const userIdField = role === 'patient' ? response.user.patientId : response.user.doctorId
-				const displayName = role === 'doctor' ? `Dr. ${fullName}` : fullName
-				
-				if (signupNote) {
-					signupNote.innerHTML = `
-						<div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9; margin-top: 20px; box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);">
-							<h4 style="margin: 0 0 12px; color: #0ea5e9; font-size: 20px;">${role === 'doctor' ? '👨‍⚕️' : '🎉'} Welcome, ${displayName}!</h4>
-							${role === 'patient' ? `<p style="margin: 0 0 16px; color: #0ea5e9; font-size: 16px;">Your Patient ID: <strong style="font-size: 22px; background: linear-gradient(135deg, #0ea5e9, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${userIdField}</strong></p>` : ''}
-							<p style="margin: 0; font-size: 14px; color: #64748b;">${role === 'patient' ? 'Please save this ID. ' : ''}Redirecting to dashboard...</p>
-							<div style="margin-top: 16px;">
-								<div style="width: 100%; height: 4px; background: #e0f2fe; border-radius: 2px; overflow: hidden;">
-									<div style="width: 0%; height: 100%; background: linear-gradient(90deg, #0ea5e9, #0284c7); border-radius: 2px; animation: progressBar 3s linear forwards;"></div>
-								</div>
-							</div>
-						</div>
-					`
-					signupNote.style.animation = 'fadeInUp 0.6s ease'
-				}
-				
-				// Store additional data for compatibility
-				if (role === 'patient') {
-					localStorage.setItem('patientID', userIdField)
-					localStorage.setItem('patientName', fullName)
-				} else if (role === 'doctor') {
-					localStorage.setItem('doctorName', fullName)
-				}
-				
-				const dest = role === 'doctor' ? 'doctor-dashboard.html' : 'patient-dashboard.html'
-				setTimeout(() => {
-					window.location.href = dest
-				}, 3000)
-				
-			} catch (error) {
-				console.error('Registration failed:', error)
-				if (signupNote) {
-					signupNote.innerHTML = `
-						<div style="text-align: center; padding: 16px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 12px; border: 2px solid #ef4444; margin-top: 16px;">
-							<p style="margin: 0; color: #dc2626; font-weight: 600;">❌ ${error.message || 'Registration failed. Please try again.'}</p>
-						</div>
-					`
-					signupNote.style.animation = 'fadeInUp 0.6s ease'
-				}
-			} finally {
-				// Reset button state
-				if (submitBtn) {
-					submitBtn.textContent = 'Sign Up'
-					submitBtn.disabled = false
-					submitBtn.style.opacity = '1'
-				}
-			}
-		})
-	}
+
 
 	// Enhanced scroll animations
 	function animateOnScroll() {
@@ -977,4 +778,256 @@ document.addEventListener('DOMContentLoaded', function() {
 			})
 		}, 1000)
 	})
-})() 
+
+	// Appointments page specific functionality
+	if (document.getElementById('appointmentsTableBody')) {
+		// Load appointments when page loads
+		document.addEventListener('DOMContentLoaded', loadAppointments)
+
+		// Event listeners for appointments page
+		const btnNewAppointment = document.getElementById('btnNewAppointment')
+		const btnExportAppointments = document.getElementById('btnExportAppointments')
+		const newAppointmentModal = document.getElementById('newAppointmentModal')
+		const viewAppointmentModal = document.getElementById('viewAppointmentModal')
+		const closeNewAppointmentModal = document.getElementById('closeNewAppointmentModal')
+		const closeViewAppointmentModal = document.getElementById('closeViewAppointmentModal')
+		const newAppointmentForm = document.getElementById('newAppointmentForm')
+		const btnApproveAppointment = document.getElementById('btnApproveAppointment')
+		const btnMarkDoneAppointment = document.getElementById('btnMarkDoneAppointment')
+
+		if (btnNewAppointment) {
+			btnNewAppointment.addEventListener('click', () => {
+				newAppointmentModal.style.display = 'block'
+			})
+		}
+
+		if (btnExportAppointments) {
+			btnExportAppointments.addEventListener('click', exportAppointments)
+		}
+
+		if (closeNewAppointmentModal) {
+			closeNewAppointmentModal.addEventListener('click', () => {
+				newAppointmentModal.style.display = 'none'
+			})
+		}
+
+		if (closeViewAppointmentModal) {
+			closeViewAppointmentModal.addEventListener('click', () => {
+				viewAppointmentModal.style.display = 'none'
+			})
+		}
+
+		if (newAppointmentForm) {
+			newAppointmentForm.addEventListener('submit', createNewAppointment)
+		}
+
+		if (btnApproveAppointment) {
+			btnApproveAppointment.addEventListener('click', () => approveAppointment(currentAppointmentId))
+		}
+
+		if (btnMarkDoneAppointment) {
+			btnMarkDoneAppointment.addEventListener('click', () => markAppointmentDone(currentAppointmentId))
+		}
+
+		// Close modals when clicking outside
+		window.addEventListener('click', (event) => {
+			if (event.target === newAppointmentModal) {
+				newAppointmentModal.style.display = 'none'
+			}
+			if (event.target === viewAppointmentModal) {
+				viewAppointmentModal.style.display = 'none'
+			}
+		})
+
+		let currentAppointmentId = null
+
+		async function loadAppointments() {
+			try {
+				const today = new Date().toISOString().split('T')[0]
+				const response = await window.meducoAPI.getAppointments({ date: today })
+				
+				if (response.success) {
+					populateAppointmentsTable(response.data.appointments)
+				} else {
+					console.error('Failed to load appointments:', response.message)
+				}
+			} catch (error) {
+				console.error('Error loading appointments:', error)
+			}
+		}
+
+		function populateAppointmentsTable(appointments) {
+			const tableBody = document.getElementById('appointmentsTableBody')
+			tableBody.innerHTML = ''
+
+			if (!appointments || appointments.length === 0) {
+				tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No appointments found</td></tr>'
+				return
+			}
+
+			appointments.forEach(appointment => {
+				const row = document.createElement('tr')
+				row.innerHTML = `
+					<td>${appointment.appointment_time}</td>
+					<td>${appointment.patient_first_name} ${appointment.patient_last_name}</td>
+					<td>${appointment.patient_id}</td>
+					<td>${appointment.type}</td>
+					<td><span class="badge ${getStatusClass(appointment.status)}">${appointment.status}</span></td>
+					<td>
+						<button class="btn btn-outline view-btn" style="padding: 4px 8px; font-size: 12px;" data-id="${appointment.id}">View</button>
+					</td>
+				`
+				tableBody.appendChild(row)
+			})
+
+			// Add event listeners to view buttons
+			document.querySelectorAll('.view-btn').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					const appointmentId = e.target.getAttribute('data-id')
+					viewAppointment(appointmentId)
+				})
+			})
+		}
+
+		function getStatusClass(status) {
+			switch (status.toLowerCase()) {
+				case 'confirmed': return ''
+				case 'pending': return 'warning'
+				case 'cancelled': return 'alert'
+				case 'completed': return 'success'
+				default: return ''
+			}
+		}
+
+		async function viewAppointment(appointmentId) {
+			try {
+				// Get appointment details (assuming we can get by ID, or filter from loaded appointments)
+				const today = new Date().toISOString().split('T')[0]
+				const response = await window.meducoAPI.getAppointments({ date: today })
+				
+				if (response.success) {
+					const appointment = response.data.appointments.find(app => app.id == appointmentId)
+					if (appointment) {
+						currentAppointmentId = appointmentId
+						const detailsDiv = document.getElementById('appointmentDetails')
+						detailsDiv.innerHTML = `
+							<p><strong>Patient:</strong> ${appointment.patient_first_name} ${appointment.patient_last_name}</p>
+							<p><strong>Patient ID:</strong> ${appointment.patient_id}</p>
+							<p><strong>Date:</strong> ${appointment.appointment_date}</p>
+							<p><strong>Time:</strong> ${appointment.appointment_time}</p>
+							<p><strong>Type:</strong> ${appointment.type}</p>
+							<p><strong>Reason:</strong> ${appointment.reason || 'N/A'}</p>
+							<p><strong>Status:</strong> ${appointment.status}</p>
+							${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ''}
+							${appointment.diagnosis ? `<p><strong>Diagnosis:</strong> ${appointment.diagnosis}</p>` : ''}
+							${appointment.prescription ? `<p><strong>Prescription:</strong> ${appointment.prescription}</p>` : ''}
+						`
+						viewAppointmentModal.style.display = 'block'
+					}
+				}
+			} catch (error) {
+				console.error('Error viewing appointment:', error)
+			}
+		}
+
+		async function createNewAppointment(event) {
+			event.preventDefault()
+			
+			const formData = new FormData(event.target)
+			const appointmentData = {
+				patientId: formData.get('patientId'),
+				appointmentDate: formData.get('appointmentDate'),
+				appointmentTime: formData.get('appointmentTime'),
+				type: formData.get('appointmentType'),
+				reason: formData.get('reason')
+			}
+
+			try {
+				const response = await window.meducoAPI.createAppointment(appointmentData)
+				
+				if (response.success) {
+					alert('Appointment created successfully!')
+					newAppointmentModal.style.display = 'none'
+					event.target.reset()
+					loadAppointments() // Reload appointments
+				} else {
+					alert('Failed to create appointment: ' + response.message)
+				}
+			} catch (error) {
+				console.error('Error creating appointment:', error)
+				alert('Error creating appointment: ' + error.message)
+			}
+		}
+
+		async function approveAppointment(appointmentId) {
+			try {
+				const response = await window.meducoAPI.updateAppointment(appointmentId, { status: 'confirmed' })
+				
+				if (response.success) {
+					alert('Appointment approved!')
+					viewAppointmentModal.style.display = 'none'
+					loadAppointments() // Reload appointments
+				} else {
+					alert('Failed to approve appointment: ' + response.message)
+				}
+			} catch (error) {
+				console.error('Error approving appointment:', error)
+				alert('Error approving appointment: ' + error.message)
+			}
+		}
+
+		async function markAppointmentDone(appointmentId) {
+			try {
+				const response = await window.meducoAPI.updateAppointment(appointmentId, { status: 'completed' })
+				
+				if (response.success) {
+					alert('Appointment marked as done!')
+					viewAppointmentModal.style.display = 'none'
+					loadAppointments() // Reload appointments
+				} else {
+					alert('Failed to mark appointment as done: ' + response.message)
+				}
+			} catch (error) {
+				console.error('Error marking appointment as done:', error)
+				alert('Error marking appointment as done: ' + error.message)
+			}
+		}
+
+		async function exportAppointments() {
+			try {
+				const today = new Date()
+				const tomorrow = new Date(today)
+				tomorrow.setDate(tomorrow.getDate() + 1)
+				const tomorrowStr = tomorrow.toISOString().split('T')[0]
+				
+				// Get today's appointments
+				const response = await window.meducoAPI.getAppointments({ date: new Date().toISOString().split('T')[0] })
+				
+				if (response.success && response.data && response.data.appointments && response.data.appointments.length > 0) {
+					// Create new appointments for tomorrow
+					const exportPromises = response.data.appointments.map(async (appointment) => {
+						const newAppointmentData = {
+							patientId: appointment.patient_id,
+							appointmentDate: tomorrowStr,
+							appointmentTime: appointment.appointment_time,
+							type: appointment.type,
+							reason: `Exported from ${appointment.appointment_date} - ${appointment.reason || ''}`
+						}
+						return window.meducoAPI.createAppointment(newAppointmentData)
+					})
+					
+					const results = await Promise.all(exportPromises)
+					const successCount = results.filter(r => r.success).length
+					
+					alert(`Exported ${successCount} appointments to ${tomorrow.toLocaleDateString()}`)
+					loadAppointments() // Reload to show any changes
+				} else {
+					alert('No appointments to export')
+				}
+			} catch (error) {
+				console.error('Error exporting appointments:', error)
+				alert('Error exporting appointments: ' + error.message)
+			}
+		}
+	}
+})()

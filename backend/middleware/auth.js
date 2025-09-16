@@ -1,3 +1,4 @@
+
 const jwt = require('jsonwebtoken');
 const database = require('../config/database');
 
@@ -14,13 +15,17 @@ const authenticateToken = async (req, res, next) => {
     }
 
     try {
+        console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+        console.log('Decoded JWT:', decoded);
+
         // Get user from database to ensure they still exist and are active
+        console.log('About to query database...');
         const user = await database.get(
-            'SELECT id, email, role, is_active FROM users WHERE id = ?',
+            'SELECT id, email, role, is_active FROM users WHERE id = $1',
             [decoded.userId]
         );
+        console.log('User from DB:', user);
 
         if (!user) {
             return res.status(401).json({
@@ -103,7 +108,7 @@ const getPatientInfo = async (req, res, next) => {
 
     try {
         const patient = await database.get(
-            'SELECT * FROM patients WHERE user_id = ?',
+            'SELECT * FROM patients WHERE user_id = $1',
             [req.user.id]
         );
 
@@ -133,7 +138,7 @@ const getDoctorInfo = async (req, res, next) => {
 
     try {
         const doctor = await database.get(
-            'SELECT * FROM doctors WHERE user_id = ?',
+            'SELECT * FROM doctors WHERE user_id = $1',
             [req.user.id]
         );
 

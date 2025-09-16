@@ -36,8 +36,9 @@
           <p class="muted">Quickly search, add, and review patient information.</p>
           <div class="card">
             <div class="row">
-              <input class="input" placeholder="Search patients by name or ID" />
-              <button class="btn btn-primary">Add Patient</button>
+              <input class="input" id="patientSearch" placeholder="Search patients by name or ID" />
+              <button class="btn btn-secondary" onclick="handlePatientSearch()">Search</button>
+              <button class="btn btn-primary" onclick="openAddPatientModal()">Add Patient</button>
             </div>
             <div class="table-wrap">
               <table>
@@ -45,69 +46,82 @@
                   <tr>
                     <th>Patient ID</th>
                     <th>Name</th>
-                    <th>Age</th>
-                    <th>Condition</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
                     <th>Last Visit</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><span style="font-family: monospace; background: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #0ea5e9; color: #0ea5e9; font-weight: 600;">PAT123456</span></td>
-                    <td>Jane Cooper</td>
-                    <td>54</td>
-                    <td>Diabetes</td>
-                    <td>2025-08-10</td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span style="font-family: monospace; background: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #0ea5e9; color: #0ea5e9; font-weight: 600;">PAT789012</span></td>
-                    <td>Wade Warren</td>
-                    <td>62</td>
-                    <td>Hypertension</td>
-                    <td>2025-08-20</td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span style="font-family: monospace; background: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #0ea5e9; color: #0ea9; font-weight: 600;">PAT345678</span></td>
-                    <td>Esther Howard</td>
-                    <td>43</td>
-                    <td>Asthma</td>
-                    <td>2025-08-17</td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span style="font-family: monospace; background: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #0ea5e9; color: #0ea5e9; font-weight: 600;">PAT901234</span></td>
-                    <td>Robert Johnson</td>
-                    <td>58</td>
-                    <td>Heart Disease</td>
-                    <td>2025-08-15</td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span style="font-family: monospace; background: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #0ea5e9; color: #0ea5e9; font-weight: 600;">PAT567890</span></td>
-                    <td>Sarah Wilson</td>
-                    <td>39</td>
-                    <td>Migraine</td>
-                    <td>2025-08-22</td>
-                    <td>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">View</button>
-                    </td>
-                  </tr>
+                  <!-- Patient data will be loaded dynamically -->
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </section>
+
+      <!-- Add Patient Modal -->
+      <div id="addPatientModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div class="modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Add New Patient</h3>
+            <button onclick="closeAddPatientModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+          </div>
+          <form id="addPatientForm">
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">First Name *</label>
+              <input class="input" name="firstName" required />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Last Name *</label>
+              <input class="input" name="lastName" required />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email *</label>
+              <input class="input" type="email" name="email" required />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Phone</label>
+              <input class="input" type="tel" name="phone" />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Date of Birth</label>
+              <input class="input" type="date" name="dateOfBirth" />
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Gender</label>
+              <select class="input" name="gender">
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 24px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Temporary Password *</label>
+              <input class="input" type="password" name="password" required placeholder="Patient will change this later" />
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">Add Patient</button>
+              <button type="button" class="btn btn-outline" onclick="closeAddPatientModal()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Patient Follow-up Modal -->
+      <div id="patientModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div class="modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Patient Details</h3>
+            <button id="closeModal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+          </div>
+          <div id="patientFollowupContent">
+            <!-- Patient details will be populated here -->
+          </div>
+        </div>
+      </div>
     </main>
 
     <footer class="site-footer">
@@ -117,5 +131,217 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+      // API Base URL
+      const API_BASE = 'http://localhost:3001/api/v1';
+
+      // Get auth token from localStorage (assuming user is logged in)
+      function getAuthToken() {
+        return localStorage.getItem('authToken');
+      }
+
+      // API helper functions
+      async function apiRequest(endpoint, options = {}) {
+        const url = `${API_BASE}${endpoint}`;
+        const token = getAuthToken();
+
+        const defaultOptions = {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          }
+        };
+
+        const response = await fetch(url, { ...defaultOptions, ...options });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'API request failed');
+        }
+
+        return data;
+      }
+
+      // Load patients from API
+      async function loadPatients(searchTerm = '') {
+        try {
+          const endpoint = searchTerm ? `/doctors/patients?search=${encodeURIComponent(searchTerm)}` : '/doctors/patients';
+          const response = await apiRequest(endpoint);
+
+          if (response.success) {
+            displayPatients(response.data.patients);
+          } else {
+            console.error('Failed to load patients: API returned success false');
+            displayPatients([]);
+          }
+        } catch (error) {
+          console.error('Failed to load patients:', error);
+          displayPatients([]);
+        }
+      }
+
+      // Display patients in table
+      function displayPatients(patients) {
+        const tbody = document.querySelector('tbody');
+        if (patients.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">No patients found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = patients.map(patient => `
+          <tr>
+            <td><span style="font-family: monospace; background: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #0ea5e9; color: #0ea5e9; font-weight: 600;">${patient.patient_id}</span></td>
+            <td>${patient.first_name} ${patient.last_name}</td>
+            <td>${patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString() : 'N/A'}</td>
+            <td>${patient.gender || 'N/A'}</td>
+            <td>${patient.last_appointment ? new Date(patient.last_appointment).toLocaleDateString() : 'No visits'}</td>
+            <td>
+              <button class="btn btn-outline view-patient-btn" data-patient-id="${patient.patient_id}" style="padding: 4px 8px; font-size: 12px;">View</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Open add patient modal
+      function openAddPatientModal() {
+        document.getElementById('addPatientModal').style.display = 'block';
+      }
+
+      // Close add patient modal
+      function closeAddPatientModal() {
+        document.getElementById('addPatientModal').style.display = 'none';
+        document.getElementById('addPatientForm').reset();
+      }
+
+      // Handle add patient form submission
+      async function handleAddPatient(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const patientData = {
+          email: formData.get('email'),
+          password: formData.get('password'),
+          role: 'patient',
+          firstName: formData.get('firstName'),
+          lastName: formData.get('lastName'),
+          phone: formData.get('phone'),
+          dateOfBirth: formData.get('dateOfBirth'),
+          gender: formData.get('gender')
+        };
+
+        try {
+          const response = await apiRequest('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify(patientData)
+          });
+
+          if (response.success) {
+            alert('Patient added successfully!');
+            closeAddPatientModal();
+            loadPatients(); // Refresh patient list
+          }
+        } catch (error) {
+          console.error('Failed to add patient:', error);
+          alert('Failed to add patient: ' + error.message);
+        }
+      }
+
+      // Handle patient search
+      function handlePatientSearch() {
+        const searchTerm = document.getElementById('patientSearch').value.trim();
+        loadPatients(searchTerm);
+      }
+
+      // View patient details
+      async function viewPatientDetails(patientId) {
+        try {
+          const response = await apiRequest(`/doctors/patients/${patientId}`);
+          displayPatientDetails(response.data.patient, patientId);
+        } catch (error) {
+          console.error('Failed to load patient details:', error);
+          alert('Failed to load patient details: ' + error.message);
+        }
+      }
+
+      // Display patient details in modal
+      function displayPatientDetails(patient, patientId) {
+        const modal = document.getElementById('patientModal');
+        const content = document.getElementById('patientFollowupContent');
+
+        content.innerHTML = `
+          <div style="margin-bottom: 20px;">
+            <h4 style="margin: 0 0 16px 0; color: var(--brand);">${patient.first_name} ${patient.last_name} - Patient Details</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                <strong>Patient ID:</strong> ${patient.patient_id || patientId}
+              </div>
+              <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                <strong>Email:</strong> ${patient.email || 'N/A'}
+              </div>
+              <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                <strong>Phone:</strong> ${patient.phone || 'N/A'}
+              </div>
+              <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                <strong>Date of Birth:</strong> ${patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString() : 'N/A'}
+              </div>
+              <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                <strong>Gender:</strong> ${patient.gender || 'N/A'}
+              </div>
+              <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                <strong>Blood Type:</strong> ${patient.blood_type || 'N/A'}
+              </div>
+            </div>
+          </div>
+          <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+            <h5 style="margin: 0 0 12px 0;">Medical Information</h5>
+            <p><strong>Allergies:</strong> ${patient.allergies || 'None reported'}</p>
+            <p><strong>Medical History:</strong> ${patient.medical_history || 'No history recorded'}</p>
+          </div>
+        `;
+
+        modal.style.display = 'block';
+      }
+
+      // Initialize page
+      document.addEventListener('DOMContentLoaded', function() {
+        // Load initial patients
+        loadPatients();
+
+        // Set up search functionality
+        const searchInput = document.getElementById('patientSearch');
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(handlePatientSearch, 300);
+        });
+
+        // Set up add patient form
+        document.getElementById('addPatientForm').addEventListener('submit', handleAddPatient);
+
+        // Set up view patient buttons (using event delegation)
+        document.addEventListener('click', function(e) {
+          if (e.target.classList.contains('view-patient-btn')) {
+            const patientId = e.target.getAttribute('data-patient-id');
+            viewPatientDetails(patientId);
+          }
+        });
+
+        // Close modals
+        document.getElementById('closeModal').addEventListener('click', function() {
+          document.getElementById('patientModal').style.display = 'none';
+        });
+
+        document.getElementById('patientModal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            this.style.display = 'none';
+          }
+        });
+
+        document.getElementById('addPatientModal').addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeAddPatientModal();
+          }
+        });
+      });
+    </script>
   </body>
-</html> 
+</html>
